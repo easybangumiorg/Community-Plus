@@ -5,15 +5,16 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// datasource db {
-//   provider = "mysql"
-//   url      = env("DATABASE_URL")
-// }
-
-// 本地开发库
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户角色（普通用户、编辑、管理员）
+enum Role {
+  USER
+  EDITOR
+  ADMIN
 }
 
 // 用户表
@@ -22,31 +23,24 @@ model User {
   account   String   @unique
   password  String
   createdAt DateTime @default(now())
+  email String? @unique
+  role  Role    @default(USER)
 
-  email   String?  @unique
-  // role    Role     @default(USER)
-  role    String   @default("USER")
-  profile Profile?
-  posts   Post[]
-}
+  posts Post[]
 
-// 用户信息表
-model Profile {
-  id     Int  @id @default(autoincrement())
-  user   User @relation(fields: [userId], references: [id])
-  userId Int  @unique
-
+  // profile
   name   String
   bio    String @default("no bio.")
   avatar String @default("https://easybangumi.org/icons/FAVICON-RAW.png")
 }
 
-// 用户角色（普通用户、编辑、管理员）
-// enum Role {
-//   USER
-//   EDITOR
-//   ADMIN
-// }
+// 番剧状态表
+enum PostStatus {
+  FINISHED // 已完结
+  AIRING // 连载中
+  NOT_YET_RELEASED // 未放送
+  CANCELLED // 已取消
+}
 
 // 番剧上传表
 model Post {
@@ -54,21 +48,22 @@ model Post {
   createdAt  DateTime @default(now())
   lastUpdate DateTime @default(now())
   published  Boolean  @default(false)
-  author     User     @relation(fields: [authorId], references: [id])
-  authorId   Int
-  category   Category @relation(fields: [cid], references: [id])
-  cid        Int
 
-  title   String
-  nsfw    Boolean
-  rating  Float
-  pubDate DateTime
-  summary String
-  cover   String
-  tags    String
-  status  String
-  // data    Json
-  data    String
+  author     User         @relation(fields: [authorId], references: [id])
+  authorId   Int
+  category   Category     @relation(fields: [cid], references: [id])
+  cid        Int
+  collection Collection[]
+
+  title      String
+  summary    String
+  cover      String
+  tags       String
+  postStatus PostStatus
+  status     String
+  data       Json
+
+  nsfw Boolean
 }
 
 // 分类表
@@ -76,4 +71,18 @@ model Category {
   id    Int    @id @default(autoincrement())
   name  String
   posts Post[]
+}
+
+enum CollectionState {
+  DRAFT // 草稿
+  ON_PRIMARY // 设为首页项目发布
+  ON_SECONDARY // 以次一级页面发布
+}
+
+// 合集表
+model Collection {
+  id      Int    @id @default(autoincrement())
+  name    String
+  summary String
+  posts   Post[]
 }
