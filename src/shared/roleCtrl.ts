@@ -33,16 +33,18 @@ export const permission = {
   'category.list': group.login, // 获取分类
   'category.get': group.login, // 获取分类信息
   'category.get.posts': group.login, // 获取分类番剧信息
-  'category.add': group.editor, // 新增分类
-  'category.edit': group.editor, // 修改分类
-  'category.delete': group.editor, // 删除分类
+  'category.add': group.admin, // 新增分类
+  'category.edit': group.admin, // 修改分类
+  'category.delete': group.admin, // 删除分类
 
   // 番剧相关权限    只有group.editor可以修改或删除别人上传的番剧
   'post.list': group.login, // 获取番剧列表
   'post.add': group.login, // 新增番剧
   'post.update': group.login, // 修改番剧
   'post.delete': group.login, // 删除番剧
+  'post.data.sync': group.login, // 同步番剧主体数据
   'post.state': group.editor, // 设置番剧公开状态
+  'post.edit': group.editor, // 修改番剧数据
 
   // 合集相关权限
   'collection.list': group.editor, // 获取合集列表

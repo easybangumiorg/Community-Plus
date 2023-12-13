@@ -10,6 +10,8 @@ import { AuthService } from './user/auth.service';
 import { UtilsService } from './utils/utils.service';
 import { CategoryService } from './category/category.service';
 import { CategoryController } from './category/category.controller';
+import { PostService } from './post/post.service';
+import { PostController } from './post/post.controller';
 
 @Module({
   imports: [
@@ -20,13 +22,14 @@ import { CategoryController } from './category/category.controller';
       signOptions: { expiresIn: '3h' },
     }),
   ],
-  controllers: [AppController, UserController, CategoryController],
+  controllers: [AppController, UserController, CategoryController, PostController],
   providers: [
     AppService,
     UserService,
     AuthService,
     UtilsService,
     CategoryService,
+    PostService,
   ],
 })
 export class AppModule {}
