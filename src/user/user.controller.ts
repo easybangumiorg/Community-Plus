@@ -126,6 +126,7 @@ export class UserController {
       });
     const col = await this.user.sumUserCollections(id);
     const pos = await this.user.sumUserPosts(id);
+    console.log(col, pos);
     if (col + pos > 0)
       throw new ForbiddenException({
         code: 403,

@@ -31,9 +31,10 @@ export const permission = {
 
   // 分类相关权限
   'category.list': group.login, // 获取分类
-  'category.get': group.editor, // 获取分类
+  'category.get': group.login, // 获取分类信息
+  'category.get.posts': group.login, // 获取分类番剧信息
   'category.add': group.editor, // 新增分类
-  'category.update': group.editor, // 修改分类
+  'category.edit': group.editor, // 修改分类
   'category.delete': group.editor, // 删除分类
 
   // 番剧相关权限    只有group.editor可以修改或删除别人上传的番剧

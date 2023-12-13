@@ -15,10 +15,48 @@ export class CategoryService {
     });
   }
 
-  getPostByCategoryId(id: number, page: number, pageSize: number) {
-    return this.prisma.post.findMany({
-      skip: page * pageSize,
-      take: pageSize,
+  editCategory(id: number, name: string) {
+    return this.prisma.category.update({
+      where: { id },
+      data: { name },
+    });
+  }
+
+  getPostByCategoryId(
+    id: number,
+    page: number,
+    pageSize: number,
+    require_all: boolean,
+  ) {
+    if (require_all) {
+      return this.prisma.post.findMany({
+        skip: page * pageSize,
+        take: pageSize,
+        where: { cid: id },
+      });
+    } else {
+      return this.prisma.post.findMany({
+        skip: page * pageSize,
+        take: pageSize,
+        where: { cid: id, published: true },
+      });
+    }
+  }
+
+  addCategory(name: string) {
+    return this.prisma.category.create({
+      data: { name },
+    });
+  }
+
+  deleteCategory(id: number) {
+    return this.prisma.category.delete({
+      where: { id },
+    });
+  }
+
+  sumPostByCategoryId(id: number) {
+    return this.prisma.post.count({
       where: { cid: id },
     });
   }
