@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 
@@ -8,31 +8,6 @@ export class UserService {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
   ) {}
-
-  async signIn(account: string, password: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { account: account },
-    });
-    if (!user)
-      throw new UnauthorizedException({
-        code: 401,
-        msg: 'Invalid account or password',
-      });
-    if (user.password !== password)
-      throw new UnauthorizedException({
-        code: 401,
-        msg: 'Invalid account or password',
-      });
-    const payload = {
-      id: user.id,
-      acc: user.account,
-      rol: user.role,
-    };
-    return {
-      token: this.jwt.sign(payload),
-      user,
-    };
-  }
 
   getUserProfileByID(id: number) {
     return this.prisma.user.findUnique({
@@ -48,6 +23,17 @@ export class UserService {
   getUserByAccount(account: string) {
     return this.prisma.user.findUnique({
       where: { account: account },
+    });
+  }
+
+  editUserProfileByID(id: number, name: string, bio: string, avatar: string) {
+    return this.prisma.user.update({
+      where: { id: id },
+      data: {
+        name: name,
+        bio: bio,
+        avatar: avatar,
+      },
     });
   }
 }

@@ -1,16 +1,15 @@
+import { SetMetadata } from '@nestjs/common';
 // 用户控制，硬编码
 
 // 用户角色表
-export const role = {
-  guest: 'GUEST',
-  user: 'USER',
-  editor: 'EDITOR',
-  admin: 'ADMIN',
-};
+export enum role {
+  user = 'USER',
+  editor = 'EDITOR',
+  admin = 'ADMIN',
+}
 
 // 用户组宏定义
 export const group = {
-  all: [role.guest, role.user, role.editor, role.admin],
   login: [role.user, role.editor, role.admin],
   editor: [role.editor, role.admin],
   admin: [role.admin],
@@ -25,6 +24,8 @@ export const permission = {
   'user.new': group.admin, // 创建用户
   'user.delete': group.admin, // 删除用户
   'user.modify': group.admin, // 修改用户信息
+  'admin.profile': group.admin, // 获取所有用户的信息
+  'admin.profile.edit': group.admin, // 修改所有用户的信息
 
   // 分类相关权限
   'category.list': group.login, // 获取分类
@@ -49,3 +50,7 @@ export const permission = {
   'collection.remove': group.editor, // 从合集移除番剧
   'collection.state': group.editor, // 设置合集显示状态
 };
+
+export const ALLOW_ROLE_KEY = 'whoCanAccess';
+export const NeedPermission = (pm: string) =>
+  SetMetadata(ALLOW_ROLE_KEY, permission[pm]);

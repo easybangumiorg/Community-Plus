@@ -23,10 +23,11 @@ model User {
   account   String   @unique
   password  String
   createdAt DateTime @default(now())
-  email String? @unique
-  role  Role    @default(USER)
+  email     String?  @unique
+  role      Role     @default(USER)
 
-  posts Post[]
+  posts       Post[]
+  collections Collection[]
 
   // profile
   name   String
@@ -81,8 +82,12 @@ enum CollectionState {
 
 // 合集表
 model Collection {
-  id      Int    @id @default(autoincrement())
-  name    String
-  summary String
-  posts   Post[]
+  id       Int     @id @default(autoincrement())
+  name     String
+  summary  String
+  isPublic Boolean @default(false)
+  posts    Post[]
+  
+  User     User?   @relation(fields: [userId], references: [id])
+  userId   Int?
 }

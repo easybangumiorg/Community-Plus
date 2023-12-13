@@ -6,6 +6,8 @@ import { UserService } from './user/user.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
 import { env } from 'process';
+import { AuthService } from './user/auth.service';
+import { UtilsService } from './utils/utils.service';
 
 @Module({
   imports: [
@@ -17,6 +19,6 @@ import { env } from 'process';
     }),
   ],
   controllers: [AppController, UserController],
-  providers: [AppService, UserService],
+  providers: [AppService, UserService, AuthService, UtilsService],
 })
 export class AppModule {}
