@@ -146,30 +146,20 @@ export class UserService {
 
   // 统计用户上传的番剧总数
   sumUserPosts(id: number) {
-    return this.prisma.post
-      .findMany({
-        where: {
-          authorId: id,
-        },
-        select: {
-          id: true,
-        },
-      })
-      .then((col) => col.length);
+    return this.prisma.post.count({
+      where: {
+        authorId: id,
+      },
+    });
   }
 
   // 统计用户整理的合集总数
   sumUserCollections(id: number) {
-    return this.prisma.collection
-      .findMany({
-        where: {
-          userId: id,
-        },
-        select: {
-          id: true,
-        },
-      })
-      .then((col) => col.length);
+    return this.prisma.collection.count({
+      where: {
+        userId: id,
+      },
+    });
   }
 
   // 重置用户密码
