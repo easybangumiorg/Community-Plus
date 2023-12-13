@@ -8,6 +8,7 @@ export class UserService {
   // eslint-disable-next-line prettier/prettier
   constructor(private readonly prisma: PrismaService) { }
 
+  // 从ID获取用户完整信息
   getUserByID(id: number) {
     return this.prisma.user
       .findUnique({
@@ -47,6 +48,7 @@ export class UserService {
       });
   }
 
+  // 从ID获取用户基本信息
   getUserProfileByID(id: number) {
     return this.prisma.user.findUnique({
       where: { id: id },
@@ -58,12 +60,14 @@ export class UserService {
     });
   }
 
+  // 从账户名获取用户所有信息（登录用，请勿从接口返回）
   getUserByAccount(account: string) {
     return this.prisma.user.findUnique({
       where: { account: account },
     });
   }
 
+  // 从ID与密码获取用户所有信息（修改密码用，请勿从接口返回）
   getPasswdUserByID(id: number, passwd: string) {
     return this.prisma.user.findUnique({
       where: {
@@ -73,6 +77,7 @@ export class UserService {
     });
   }
 
+  // 根据用户ID编辑用户基本信息
   editUserProfileByID(id: number, name: string, bio: string, avatar: string) {
     return this.prisma.user.update({
       where: { id: id },
@@ -84,6 +89,7 @@ export class UserService {
     });
   }
 
+  // 分页获取用户列表
   getUserList(page: number, pageSize: number) {
     return this.prisma.user.findMany({
       skip: page * pageSize,
@@ -101,6 +107,7 @@ export class UserService {
     });
   }
 
+  // 注册一个新用户
   signUpUser(account: string, password: string) {
     return this.prisma.user
       .create({
@@ -127,6 +134,7 @@ export class UserService {
       });
   }
 
+  // 从ID删除用户
   deleteUserByID(id: number) {
     return this.prisma.user.delete({
       where: { id: id },
@@ -136,6 +144,7 @@ export class UserService {
     });
   }
 
+  // 统计用户上传的番剧总数
   sumUserPosts(id: number) {
     return this.prisma.post
       .findMany({
@@ -149,6 +158,7 @@ export class UserService {
       .then((col) => col.length);
   }
 
+  // 统计用户整理的合集总数
   sumUserCollections(id: number) {
     return this.prisma.collection
       .findMany({
@@ -162,6 +172,7 @@ export class UserService {
       .then((col) => col.length);
   }
 
+  // 重置用户密码
   editUserPasswd(id: number, password: string) {
     return this.prisma.user.update({
       where: { id: id },
@@ -178,6 +189,7 @@ export class UserService {
     });
   }
 
+  // 编辑用户信息
   editUserByID(
     id: number,
     { account, email, role, name, bio, avatar }: UserInfo,

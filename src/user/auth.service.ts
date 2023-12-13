@@ -16,6 +16,7 @@ export class AuthService {
     // eslint-disable-next-line prettier/prettier
   ) { }
 
+  // 检查用户登录并签发Token
   async signIn(account: string, password: string): Promise<userSignInDto> {
     const user = await this.userService.getUserByAccount(account);
     if (!user)
@@ -48,6 +49,7 @@ export class AuthService {
     };
   }
 
+  // 修改用户密码
   async changePassword(id: number, oldPasswd: string, newPasswd: string) {
     const user = await this.userService.getPasswdUserByID(id, oldPasswd);
     if (!user)

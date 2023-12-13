@@ -8,6 +8,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { env } from 'process';
 import { AuthService } from './user/auth.service';
 import { UtilsService } from './utils/utils.service';
+import { CategoryService } from './category/category.service';
+import { CategoryController } from './category/category.controller';
 
 @Module({
   imports: [
@@ -15,10 +17,16 @@ import { UtilsService } from './utils/utils.service';
     JwtModule.register({
       global: true,
       secret: env.JWT_SIGN_KEY,
-      signOptions: { expiresIn: '2d' },
+      signOptions: { expiresIn: '3h' },
     }),
   ],
-  controllers: [AppController, UserController],
-  providers: [AppService, UserService, AuthService, UtilsService],
+  controllers: [AppController, UserController, CategoryController],
+  providers: [
+    AppService,
+    UserService,
+    AuthService,
+    UtilsService,
+    CategoryService,
+  ],
 })
 export class AppModule {}

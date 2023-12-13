@@ -31,6 +31,7 @@ export const permission = {
 
   // 分类相关权限
   'category.list': group.login, // 获取分类
+  'category.get': group.editor, // 获取分类
   'category.add': group.editor, // 新增分类
   'category.update': group.editor, // 修改分类
   'category.delete': group.editor, // 删除分类
@@ -46,7 +47,7 @@ export const permission = {
   'collection.list': group.editor, // 获取合集列表
   'collection.get': group.editor, // 获取合集信息
   'collection.add': group.editor, // 新建合集
-  'collection.update': group.editor, // 修改合集
+  'collection.update': group.editor, // 修改合集信息
   'collection.delete': group.editor, // 删除合集
   'collection.append': group.editor, // 向合集追加番剧
   'collection.remove': group.editor, // 从合集移除番剧

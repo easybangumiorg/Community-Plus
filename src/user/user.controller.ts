@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -30,7 +31,7 @@ export class UserController {
   ): Promise<ResponseDto<userSignInDto>> {
     return {
       code: 200,
-      msg: 'Sign in successfully',
+      msg: 'success',
       data: await this.auth.signIn(account, passwd),
     };
   }
@@ -41,7 +42,7 @@ export class UserController {
   async getProfile(@Request() { user }): Promise<ResponseDto<userProfileDto>> {
     return {
       code: 200,
-      msg: 'Get profile successfully',
+      msg: 'success',
       data: await this.user.getUserProfileByID(user.id),
     };
   }
@@ -55,7 +56,7 @@ export class UserController {
   ): Promise<ResponseDto<userProfileDto>> {
     return {
       code: 200,
-      msg: 'Edit profile successfully',
+      msg: 'success',
       data: await this.user.editUserProfileByID(user.id, name, bio, avatar),
     };
   }
@@ -64,12 +65,19 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Get('list')
   async getUserList(
-    @Param('page') page = 0,
-    @Param('pageSize') pageSize = 10,
+    @Query('page') page: number = 0,
+    @Query('pageSize') pageSize: number = 10,
   ): Promise<ResponseDto<userProfileDto[]>> {
+    page = Number(page);
+    pageSize = Number(pageSize);
+    if (page < 0 || pageSize <= 0)
+      throw new ForbiddenException({
+        code: 403,
+        msg: 'Invalid page or pageSize',
+      });
     return {
       code: 200,
-      msg: 'Get user list successfully',
+      msg: 'success',
       data: await this.user.getUserList(page, pageSize),
     };
   }
@@ -82,7 +90,7 @@ export class UserController {
   ): Promise<ResponseDto<userInfoDto>> {
     return {
       code: 200,
-      msg: 'New user successfully',
+      msg: 'success',
       data: await this.user.signUpUser(account, passwd),
     };
   }
@@ -101,7 +109,7 @@ export class UserController {
       });
     return {
       code: 200,
-      msg: 'Change password successfully',
+      msg: 'success',
       data: await this.auth.changePassword(user.id, oldPasswd, newPasswd),
     };
   }
@@ -129,7 +137,7 @@ export class UserController {
       });
     return {
       code: 200,
-      msg: 'Delete user successfully',
+      msg: 'success',
       data: await this.user.deleteUserByID(id),
     };
   }
@@ -144,7 +152,7 @@ export class UserController {
     id = Number(id);
     return {
       code: 200,
-      msg: 'Edit user successfully',
+      msg: 'success',
       data: await this.user.editUserByID(id, userInfo),
     };
   }
@@ -156,7 +164,7 @@ export class UserController {
     id = Number(id);
     return {
       code: 200,
-      msg: 'Get user successfully',
+      msg: 'success',
       data: await this.user.getUserByID(id),
     };
   }
