@@ -20,12 +20,14 @@ export const permission = {
   // 用户相关权限
   'user.profile': group.login, // 获取用户信息
   'user.profile.edit': group.login, // 编辑用户信息
+  'user.email.bind': group.login, // 绑定邮箱
+  'user.email.unbind': group.login, // 解绑邮箱
+  'user.passwd.reset': group.login, // 重置密码
   'user.list': group.admin, // 获取用户列表
+  'user.get': group.admin, // 获取用户信息
   'user.new': group.admin, // 创建用户
   'user.delete': group.admin, // 删除用户
   'user.modify': group.admin, // 修改用户信息
-  'admin.profile': group.admin, // 获取所有用户的信息
-  'admin.profile.edit': group.admin, // 修改所有用户的信息
 
   // 分类相关权限
   'category.list': group.login, // 获取分类
