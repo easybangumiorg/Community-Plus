@@ -52,8 +52,8 @@ export const permission = {
   'post.state.publish': group.editor, // 设置番剧公开状态
 
   // 合集相关权限
-  'collection.list': group.editor, // 获取合集列表
-  'collection.get': group.editor, // 获取合集信息
+  'collection.list': group.login, // 获取合集列表
+  'collection.get': group.login, // 获取合集信息
   'collection.add': group.editor, // 新建合集
   'collection.update': group.editor, // 修改合集信息
   'collection.delete': group.editor, // 删除合集

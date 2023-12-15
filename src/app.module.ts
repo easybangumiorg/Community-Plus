@@ -12,6 +12,8 @@ import { CategoryService } from './category/category.service';
 import { CategoryController } from './category/category.controller';
 import { PostService } from './post/post.service';
 import { PostController } from './post/post.controller';
+import { CollectionService } from './collection/collection.service';
+import { CollectionController } from './collection/collection.controller';
 
 @Module({
   imports: [
@@ -22,7 +24,7 @@ import { PostController } from './post/post.controller';
       signOptions: { expiresIn: '3h' },
     }),
   ],
-  controllers: [AppController, UserController, CategoryController, PostController],
+  controllers: [AppController, UserController, CategoryController, PostController, CollectionController],
   providers: [
     AppService,
     UserService,
@@ -30,6 +32,7 @@ import { PostController } from './post/post.controller';
     UtilsService,
     CategoryService,
     PostService,
+    CollectionService,
   ],
 })
 export class AppModule {}
