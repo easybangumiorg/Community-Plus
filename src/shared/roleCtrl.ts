@@ -40,11 +40,16 @@ export const permission = {
   // 番剧相关权限    只有group.editor可以修改或删除别人上传的番剧
   'post.list': group.login, // 获取番剧列表
   'post.add': group.login, // 新增番剧
-  'post.update': group.login, // 修改番剧
+  'post.get': group.login, // 获取番剧详细信息
+  'post.update': group.login, // 修改番剧信息
+  'post.update.overuser': group.editor, // 修改别人的番剧信息
   'post.delete': group.login, // 删除番剧
-  'post.data.sync': group.login, // 同步番剧主体数据
-  'post.state': group.editor, // 设置番剧公开状态
-  'post.edit': group.editor, // 修改番剧数据
+  'post.data.set': group.login, // 设置番剧主体数据
+  'post.data.set.overuser': group.editor, // 设置别人番剧主体数据
+  'post.data.get': group.login, // 获取番剧主体数据
+  'post.state.ready': group.login, // 设置番剧的编辑状态
+  'post.state.ready.overuser': group.login, // 设置别人的番剧的编辑状态
+  'post.state.publish': group.editor, // 设置番剧公开状态
 
   // 合集相关权限
   'collection.list': group.editor, // 获取合集列表
@@ -60,3 +65,7 @@ export const permission = {
 export const ALLOW_ROLE_KEY = 'whoCanAccess';
 export const NeedPermission = (pm: string) =>
   SetMetadata(ALLOW_ROLE_KEY, permission[pm]);
+
+export function checkPermission(role: role, perm: string): boolean {
+  return permission[perm].includes(role);
+}

@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -27,7 +28,10 @@ export class AuthGuard implements CanActivate {
     );
     // 处理令牌，将用户信息保存到request中
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException({
+        code: 401,
+        msg: 'User Need signin',
+      });
     }
     try {
       const payload = await this.jwtService.verifyAsync<jwtPayload>(token, {
@@ -43,7 +47,7 @@ export class AuthGuard implements CanActivate {
     // 处理权限相关内容，如不定义具体谁可以访问，则默认所有用户可以访问
     if (whoCanAccess) {
       if (!whoCanAccess.includes(request['user'].rol as role)) {
-        throw new UnauthorizedException({
+        throw new ForbiddenException({
           code: 403,
           msg: 'Permission denied',
         });

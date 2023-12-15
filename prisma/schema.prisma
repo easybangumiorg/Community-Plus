@@ -48,6 +48,7 @@ model Post {
   id         Int      @id @default(autoincrement())
   createdAt  DateTime @default(now())
   lastUpdate DateTime @default(now())
+  onReadyPub Boolean  @default(false)
   published  Boolean  @default(false)
 
   author     User         @relation(fields: [authorId], references: [id])
@@ -69,8 +70,8 @@ model Post {
 
 // 分类表
 model Category {
-  id    Int    @id @default(autoincrement())
-  name  String
+  id   Int    @id @default(autoincrement())
+  name String
 
   posts Post[]
 }
@@ -83,13 +84,13 @@ enum CollectionState {
 
 // 合集表
 model Collection {
-  id       Int     @id @default(autoincrement())
-  name     String
-  summary  String
-  cover    String
-  state    CollectionState
+  id      Int             @id @default(autoincrement())
+  name    String
+  summary String
+  cover   String
+  state   CollectionState
 
-  posts    Post[]
-  User   User? @relation(fields: [userId], references: [id])
+  posts  Post[]
+  User   User?  @relation(fields: [userId], references: [id])
   userId Int?
 }

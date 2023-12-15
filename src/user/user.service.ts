@@ -13,24 +13,6 @@ export class UserService {
     return this.prisma.user
       .findUnique({
         where: { id: id },
-        select: {
-          id: true,
-          account: true,
-          createdAt: true,
-          role: true,
-          email: true,
-          name: true,
-          bio: true,
-          avatar: true,
-        },
-      })
-      .then((user) => {
-        if (!user)
-          throw new BadRequestException({
-            code: 400,
-            msg: 'Invalid user id',
-          });
-        return user;
       })
       .then((user) => {
         return {
