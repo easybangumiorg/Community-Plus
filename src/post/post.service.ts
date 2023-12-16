@@ -98,13 +98,13 @@ export class PostService {
   }
 
   // 修改番剧
-  updatePost(id: number, create: editPostDto) {
+  updatePost(id: number, post: editPostDto) {
     return this.prisma.post.update({
       where: {
         id,
       },
       data: {
-        ...create,
+        ...post,
         lastUpdate: new Date(),
       },
     });

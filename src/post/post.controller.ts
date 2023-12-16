@@ -15,6 +15,11 @@ import { NeedPermission, ResponseDto, checkPermission } from 'src/shared';
 import { AuthGuard } from 'src/user/auth.guard';
 import { createPostDto, editPostDto } from './dto/postDto';
 
+/**
+ * 番剧控制器
+ * !在添加和修改番剧时，应进行解包操作，防止用户传入不必要的数据
+ */
+
 @Controller('post')
 export class PostController {
   // eslint-disable-next-line prettier/prettier
@@ -108,6 +113,7 @@ export class PostController {
     @Request() { user },
   ): Promise<ResponseDto<any>> {
     id = Number(id);
+    const { cid, title, cover, summary, tags, postStatus, status, nsfw } = post;
     if (
       !checkPermission(user.rol, 'post.update.overuser') &&
       !(await this.post.checkPostIsUser(id, user.id))
@@ -121,7 +127,16 @@ export class PostController {
     return {
       code: 200,
       msg: 'success',
-      data: await this.post.updatePost(id, post),
+      data: await this.post.updatePost(id, {
+        cid,
+        title,
+        cover,
+        summary,
+        tags,
+        postStatus,
+        status,
+        nsfw,
+      }),
     };
   }
 

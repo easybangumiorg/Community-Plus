@@ -77,7 +77,7 @@ model Category {
 }
 
 enum CollectionState {
-  DRAFT // 草稿
+  DRAFT // 草稿（如果有可以发布合集的地方将会新增）
   ON_PRIMARY // 设为首页项目发布
   ON_SECONDARY // 以次一级页面发布
 }
@@ -88,7 +88,7 @@ model Collection {
   name    String
   summary String
   cover   String
-  state   CollectionState
+  state   CollectionState @default(DRAFT)
 
   posts  Post[]
   User   User?  @relation(fields: [userId], references: [id])
