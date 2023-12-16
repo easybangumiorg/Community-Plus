@@ -24,7 +24,13 @@ import { CollectionController } from './collection/collection.controller';
       signOptions: { expiresIn: '3h' },
     }),
   ],
-  controllers: [AppController, UserController, CategoryController, PostController, CollectionController],
+  controllers: [
+    AppController,
+    UserController,
+    CategoryController,
+    PostController,
+    CollectionController,
+  ],
   providers: [
     AppService,
     UserService,

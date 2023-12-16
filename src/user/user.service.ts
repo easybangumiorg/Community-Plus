@@ -1,12 +1,24 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { $Enums } from '@prisma/client';
 import { UserInfo } from './dto/userInfoDto';
+import { AppService } from 'src/app.service';
+import { AppConfig } from 'src/shared';
 
 @Injectable()
 export class UserService {
-  // eslint-disable-next-line prettier/prettier
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly app: AppService,
+  ) {
+    this.appConfig = this.app.getConfig();
+  }
+
+  private readonly appConfig: AppConfig;
 
   // 从ID获取用户完整信息
   getUserByID(id: number) {
@@ -72,7 +84,15 @@ export class UserService {
   }
 
   // 分页获取用户列表
-  getUserList(page: number, pageSize: number) {
+  getUserList(
+    page: number = 0,
+    pageSize: number = this.appConfig.defaultPageSize,
+  ) {
+    if (page < 0 || pageSize <= 0 || pageSize > this.appConfig.maxPageSize)
+      throw new ForbiddenException({
+        code: 403,
+        msg: 'Invalid page or pageSize',
+      });
     return this.prisma.user.findMany({
       skip: page * pageSize,
       take: pageSize,

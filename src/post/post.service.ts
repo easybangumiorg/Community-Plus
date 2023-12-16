@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { createPostDto, editPostDto } from './dto/postDto';
+import { AppService } from 'src/app.service';
+import { AppConfig } from 'src/shared';
 
 const select_exclude_data = {
   id: true,
@@ -17,17 +19,33 @@ const select_exclude_data = {
   status: true,
 };
 
+/**
+ * 番剧服务
+ * !在添加和修改番剧时，应进行解包操作，防止用户传入不必要的数据
+ */
+
 @Injectable()
 export class PostService {
-  // eslint-disable-next-line prettier/prettier
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly app: AppService,
+  ) {
+    this.appConfig = this.app.getConfig();
+  }
+
+  private readonly appConfig: AppConfig;
 
   // 获取番剧列表，提供一定的筛选功能
   getPostList(
-    page: number,
-    pageSize: number,
+    page: number = 0,
+    pageSize: number = this.appConfig.defaultPageSize,
     { cid, authorId, published, postStatus, nsfw, onReadyPub },
   ) {
+    if (page < 0 || pageSize <= 0 || pageSize > this.appConfig.maxPageSize)
+      throw new ForbiddenException({
+        code: 403,
+        msg: 'Invalid page or pageSize',
+      });
     return this.prisma.post.findMany({
       skip: page * pageSize,
       take: pageSize,
@@ -88,10 +106,19 @@ export class PostService {
   }
 
   // 新增番剧
-  addPost(create: createPostDto) {
+  addPost(authorId: number, post: createPostDto) {
+    const { cid, title, cover, summary, tags, postStatus, status, nsfw } = post;
     return this.prisma.post.create({
       data: {
-        ...create,
+        cid,
+        authorId,
+        title,
+        cover,
+        summary,
+        tags,
+        postStatus,
+        status,
+        nsfw,
         data: {},
       },
     });
@@ -99,12 +126,20 @@ export class PostService {
 
   // 修改番剧
   updatePost(id: number, post: editPostDto) {
+    const { cid, title, cover, summary, tags, postStatus, status, nsfw } = post;
     return this.prisma.post.update({
       where: {
         id,
       },
       data: {
-        ...post,
+        cid,
+        title,
+        cover,
+        summary,
+        tags,
+        postStatus,
+        status,
+        nsfw,
         lastUpdate: new Date(),
       },
     });

@@ -68,17 +68,13 @@ export class UserController {
     @Query('page') page: number = 0,
     @Query('pageSize') pageSize: number = 10,
   ): Promise<ResponseDto<userProfileDto[]>> {
-    page = Number(page);
-    pageSize = Number(pageSize);
-    if (page < 0 || pageSize <= 0)
-      throw new ForbiddenException({
-        code: 403,
-        msg: 'Invalid page or pageSize',
-      });
     return {
       code: 200,
       msg: 'success',
-      data: await this.user.getUserList(page, pageSize),
+      data: await this.user.getUserList(
+        page && Number(page),
+        pageSize && Number(pageSize),
+      ),
     };
   }
 

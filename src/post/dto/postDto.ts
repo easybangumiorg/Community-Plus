@@ -2,7 +2,6 @@ import { $Enums } from '@prisma/client';
 
 export class createPostDto {
   cid: number;
-  authorId: number;
   title: string;
   cover: string;
   summary: string;

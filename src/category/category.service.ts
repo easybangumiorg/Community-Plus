@@ -1,10 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { AppService } from 'src/app.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { AppConfig } from 'src/shared';
 
 @Injectable()
 export class CategoryService {
   // eslint-disable-next-line prettier/prettier
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly app: AppService,
+  ) {
+    this.appConfig = this.app.getConfig();
+  }
+
+  private readonly appConfig: AppConfig;
 
   // 获取所有分类
   getAllCategory() {
@@ -29,10 +38,15 @@ export class CategoryService {
   // 获取分类下的番剧
   getPostByCategoryId(
     id: number,
-    page: number,
-    pageSize: number,
+    page: number = 0,
+    pageSize: number = this.appConfig.defaultPageSize,
     require_all: boolean,
   ) {
+    if (page < 0 || pageSize <= 0 || pageSize > this.appConfig.maxPageSize)
+      throw new ForbiddenException({
+        code: 403,
+        msg: 'Invalid page or pageSize',
+      });
     const select = {
       id: true,
       createdAt: true,
