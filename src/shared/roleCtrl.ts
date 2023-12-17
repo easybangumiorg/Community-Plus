@@ -65,7 +65,6 @@ export const permission = {
   'collection.remove': group.editor, // 从合集移除番剧
   'collection.remove.overuser': group.editor, // 从他用户的合集移除番剧
   'collection.state': group.editor, // 设置合集显示状态
-  'collection.state.overuser': group.editor, // 设置其他用户上传合集的显示状态
 };
 
 export const ALLOW_ROLE_KEY = 'whoCanAccess';

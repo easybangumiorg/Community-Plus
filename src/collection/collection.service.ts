@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { createCollectionDto, editCollectionDto } from './dto/collectionDto';
 import { AppService } from 'src/app.service';
 import { AppConfig } from 'src/shared';
+import { $Enums } from '@prisma/client';
 
 @Injectable()
 export class CollectionService {
@@ -129,6 +130,11 @@ export class CollectionService {
       where: {
         id,
       },
+      select: {
+        id: true,
+        name: true,
+        userId: true,
+      },
     });
   }
 
@@ -145,6 +151,11 @@ export class CollectionService {
         },
         lastUpdate: new Date(),
       },
+      select: {
+        id: true,
+        name: true,
+        userId: true,
+      },
     });
   }
 
@@ -160,6 +171,11 @@ export class CollectionService {
           },
         },
       },
+      select: {
+        id: true,
+        name: true,
+        userId: true,
+      },
     });
   }
 
@@ -168,6 +184,23 @@ export class CollectionService {
       where: {
         id,
         userId,
+      },
+    });
+  }
+
+  setState(id: number, state: $Enums.CollectionState) {
+    return this.prisma.collection.update({
+      where: {
+        id,
+      },
+      data: {
+        state,
+      },
+      select: {
+        id: true,
+        name: true,
+        userId: true,
+        state: true,
       },
     });
   }
