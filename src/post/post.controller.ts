@@ -131,13 +131,25 @@ export class PostController {
   @NeedPermission('post.delete')
   @UseGuards(AuthGuard)
   @Delete(':id')
-  async deletePost(@Param('id') id: number): Promise<ResponseDto<any>> {
+  async deletePost(
+    @Param('id') id: number,
+    @Request() { user },
+  ): Promise<ResponseDto<any>> {
     id = Number(id);
     const count = await this.post.checkPostInCollection(id);
     if (count > 0) {
       throw new ForbiddenException({
         code: 403,
         msg: 'post is referenced by the collection',
+      });
+    }
+    if (
+      !checkPermission(user.rol, 'post.state.delete.overuser') &&
+      !(await this.post.checkPostIsUser(id, user.id))
+    ) {
+      throw new ForbiddenException({
+        code: 403,
+        msg: 'Permission denied',
       });
     }
     return {

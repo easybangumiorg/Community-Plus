@@ -84,11 +84,13 @@ enum CollectionState {
 
 // 合集表
 model Collection {
-  id      Int             @id @default(autoincrement())
-  name    String
-  summary String
-  cover   String
-  state   CollectionState @default(DRAFT)
+  id         Int             @id @default(autoincrement())
+  createdAt  DateTime        @default(now())
+  lastUpdate DateTime        @default(now())
+  name       String
+  summary    String
+  cover      String
+  state      CollectionState @default(DRAFT)
 
   posts  Post[]
   User   User?  @relation(fields: [userId], references: [id])

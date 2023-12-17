@@ -42,11 +42,11 @@ export class CollectionService {
         summary,
         cover,
         state,
+        lastUpdate: new Date(),
       },
     });
   }
 
-  // 提供合集列表，提供一定的筛选功能
   listCollection(
     page: number = 0,
     pageSize: number = this.appConfig.defaultPageSize,
@@ -74,7 +74,6 @@ export class CollectionService {
     });
   }
 
-  // 获取合集信息，包括合集中的番剧信息，分页返回
   getCollection(
     id: number,
     page: number = 0,
@@ -108,6 +107,67 @@ export class CollectionService {
             status: true,
           },
         },
+      },
+    });
+  }
+
+  sumCollection(id: number) {
+    // 获取合集中的番剧数量
+    return this.prisma.post.count({
+      where: {
+        collection: {
+          some: {
+            id,
+          },
+        },
+      },
+    });
+  }
+
+  deleteCollection(id: number) {
+    return this.prisma.collection.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
+  appendPost(id: number, postId: number) {
+    return this.prisma.collection.update({
+      where: {
+        id,
+      },
+      data: {
+        posts: {
+          connect: {
+            id: postId,
+          },
+        },
+        lastUpdate: new Date(),
+      },
+    });
+  }
+
+  removePost(id: number, postId: number) {
+    return this.prisma.collection.update({
+      where: {
+        id,
+      },
+      data: {
+        posts: {
+          disconnect: {
+            id: postId,
+          },
+        },
+      },
+    });
+  }
+
+  checkCollectionIsUser(id: number, userId: number) {
+    return this.prisma.collection.findUnique({
+      where: {
+        id,
+        userId,
       },
     });
   }

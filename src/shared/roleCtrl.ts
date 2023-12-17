@@ -44,11 +44,12 @@ export const permission = {
   'post.update': group.login, // 修改番剧信息
   'post.update.overuser': group.editor, // 修改别人的番剧信息
   'post.delete': group.login, // 删除番剧
+  'post.delete.overuser': group.editor, // 删除别人的番剧
   'post.data.set': group.login, // 设置番剧主体数据
   'post.data.set.overuser': group.editor, // 设置别人番剧主体数据
   'post.data.get': group.login, // 获取番剧主体数据
   'post.state.ready': group.login, // 设置番剧的编辑状态
-  'post.state.ready.overuser': group.login, // 设置别人的番剧的编辑状态
+  'post.state.ready.overuser': group.editor, // 设置别人的番剧的编辑状态
   'post.state.publish': group.editor, // 设置番剧公开状态
 
   // 合集相关权限
@@ -56,10 +57,15 @@ export const permission = {
   'collection.get': group.login, // 获取合集信息
   'collection.add': group.editor, // 新建合集
   'collection.update': group.editor, // 修改合集信息
+  'collection.update.overuser': group.editor, // 修改其他用户上传合集的信息
   'collection.delete': group.editor, // 删除合集
+  'collection.delete.overuser': group.editor, // 删除其他用户上传的合集
   'collection.append': group.editor, // 向合集追加番剧
+  'collection.append.overuser': group.editor, // 向他用户的合集追加番剧
   'collection.remove': group.editor, // 从合集移除番剧
+  'collection.remove.overuser': group.editor, // 从他用户的合集移除番剧
   'collection.state': group.editor, // 设置合集显示状态
+  'collection.state.overuser': group.editor, // 设置其他用户上传合集的显示状态
 };
 
 export const ALLOW_ROLE_KEY = 'whoCanAccess';
