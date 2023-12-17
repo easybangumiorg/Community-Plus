@@ -93,10 +93,8 @@ export class CategoryController {
     @Param('id') id: number,
     @Query('page') page: number,
     @Query('pageSize') pageSize: number,
-    @Query('all') all: boolean = false,
   ): Promise<ResponseDto<any>> {
     id = Number(id);
-    all = true ? String(all) === 'true' : false;
     return {
       code: 200,
       msg: 'success',
@@ -104,7 +102,6 @@ export class CategoryController {
         id,
         page && Number(page),
         pageSize && Number(pageSize),
-        all,
       ),
     };
   }

@@ -41,13 +41,13 @@ export const permission = {
   'post.list': group.login, // 获取番剧列表
   'post.add': group.login, // 新增番剧
   'post.get': group.login, // 获取番剧详细信息
+  'post.data.get': group.login, // 获取番剧主体数据
   'post.update': group.login, // 修改番剧信息
   'post.update.overuser': group.editor, // 修改别人的番剧信息
   'post.delete': group.login, // 删除番剧
   'post.delete.overuser': group.editor, // 删除别人的番剧
   'post.data.set': group.login, // 设置番剧主体数据
   'post.data.set.overuser': group.editor, // 设置别人番剧主体数据
-  'post.data.get': group.login, // 获取番剧主体数据
   'post.state.ready': group.login, // 设置番剧的编辑状态
   'post.state.ready.overuser': group.editor, // 设置别人的番剧的编辑状态
   'post.state.publish': group.editor, // 设置番剧公开状态

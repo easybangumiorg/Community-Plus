@@ -40,7 +40,6 @@ export class CategoryService {
     id: number,
     page: number = 0,
     pageSize: number = this.appConfig.defaultPageSize,
-    require_all: boolean,
   ) {
     if (page < 0 || pageSize <= 0 || pageSize > this.appConfig.maxPageSize)
       throw new ForbiddenException({
@@ -61,21 +60,12 @@ export class CategoryService {
       postStatus: true,
       status: true,
     };
-    if (require_all) {
-      return this.prisma.post.findMany({
-        skip: page * pageSize,
-        take: pageSize,
-        where: { cid: id },
-        select,
-      });
-    } else {
-      return this.prisma.post.findMany({
-        skip: page * pageSize,
-        take: pageSize,
-        where: { cid: id, published: true },
-        select,
-      });
-    }
+    return this.prisma.post.findMany({
+      skip: page * pageSize,
+      take: pageSize,
+      where: { cid: id },
+      select,
+    });
   }
 
   // 新增分类
