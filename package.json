@@ -1,10 +1,10 @@
 {
-  "name": "extp",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "name": "community-plus",
+  "version": "1.2.1",
+  "description": "一个开源的、轻量的番剧管理实现，用于纯纯看番社区版插件的后端，专为纯纯看番插件化而实现。",
+  "author": "AyalaKaguya",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MPL 2.0",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
