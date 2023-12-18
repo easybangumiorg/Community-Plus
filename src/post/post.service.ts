@@ -194,7 +194,7 @@ export class PostService {
   }
 
   // 检查番剧是否被合集引用
-  checkPostInCollection(id: number) {
+  sumCollectionInPost(id: number) {
     return this.prisma.collection.count({
       where: {
         posts: {

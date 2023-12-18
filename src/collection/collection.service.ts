@@ -5,6 +5,14 @@ import { AppService } from 'src/app.service';
 import { AppConfig } from 'src/shared';
 import { $Enums } from '@prisma/client';
 
+const select_only_info = {
+  id: true,
+  name: true,
+  summary: true,
+  cover: true,
+  state: true,
+};
+
 @Injectable()
 export class CollectionService {
   constructor(
@@ -27,13 +35,13 @@ export class CollectionService {
         cover,
         userId: userId,
       },
+      select: {
+        ...select_only_info,
+      },
     });
   }
 
-  editCollection(
-    id: number,
-    { name, summary, cover, state }: editCollectionDto,
-  ) {
+  editCollection(id: number, { name, summary, cover }: editCollectionDto) {
     return this.prisma.collection.update({
       where: {
         id,
@@ -42,8 +50,10 @@ export class CollectionService {
         name,
         summary,
         cover,
-        state,
         lastUpdate: new Date(),
+      },
+      select: {
+        ...select_only_info,
       },
     });
   }
@@ -66,11 +76,7 @@ export class CollectionService {
         state,
       },
       select: {
-        id: true,
-        name: true,
-        summary: true,
-        cover: true,
-        state: true,
+        ...select_only_info,
       },
     });
   }
@@ -90,11 +96,7 @@ export class CollectionService {
         id,
       },
       select: {
-        id: true,
-        name: true,
-        summary: true,
-        cover: true,
-        state: true,
+        ...select_only_info,
         posts: {
           skip: page * pageSize,
           take: pageSize,
@@ -112,7 +114,7 @@ export class CollectionService {
     });
   }
 
-  sumCollection(id: number) {
+  sumPostInCollection(id: number) {
     // 获取合集中的番剧数量
     return this.prisma.post.count({
       where: {
@@ -131,9 +133,7 @@ export class CollectionService {
         id,
       },
       select: {
-        id: true,
-        name: true,
-        userId: true,
+        ...select_only_info,
       },
     });
   }
@@ -152,9 +152,7 @@ export class CollectionService {
         lastUpdate: new Date(),
       },
       select: {
-        id: true,
-        name: true,
-        userId: true,
+        ...select_only_info,
       },
     });
   }
@@ -172,9 +170,7 @@ export class CollectionService {
         },
       },
       select: {
-        id: true,
-        name: true,
-        userId: true,
+        ...select_only_info,
       },
     });
   }
@@ -184,6 +180,9 @@ export class CollectionService {
       where: {
         id,
         userId,
+      },
+      select: {
+        id: true,
       },
     });
   }
@@ -197,10 +196,7 @@ export class CollectionService {
         state,
       },
       select: {
-        id: true,
-        name: true,
-        userId: true,
-        state: true,
+        ...select_only_info,
       },
     });
   }

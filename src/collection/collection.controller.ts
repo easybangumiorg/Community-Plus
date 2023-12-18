@@ -48,6 +48,7 @@ export class CollectionController {
     @Query('page') page: number,
     @Query('pageSize') pageSize: number,
   ): Promise<ResponseDto<any>> {
+    id = Number(id);
     return {
       code: 200,
       msg: 'success',
@@ -106,6 +107,13 @@ export class CollectionController {
     @Request() { user },
   ): Promise<ResponseDto<any>> {
     id = Number(id);
+    const count = await this.collection.sumPostInCollection(id);
+    if (count > 0) {
+      throw new ForbiddenException({
+        code: 403,
+        msg: 'There are posts that is referenced by the collection',
+      });
+    }
     if (
       !(await this.collection.checkCollectionIsUser(id, user.id)) &&
       !checkPermission(user.rol, 'collection.delete.overuser')

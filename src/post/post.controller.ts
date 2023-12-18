@@ -136,7 +136,7 @@ export class PostController {
     @Request() { user },
   ): Promise<ResponseDto<any>> {
     id = Number(id);
-    const count = await this.post.checkPostInCollection(id);
+    const count = await this.post.sumCollectionInPost(id);
     if (count > 0) {
       throw new ForbiddenException({
         code: 403,
