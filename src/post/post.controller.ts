@@ -85,7 +85,7 @@ export class PostController {
     id = Number(id);
     return {
       code: 200,
-      msg: `success get data of id:${id}`,
+      msg: `success`,
       data: await this.post.getPostData(id),
     };
   }

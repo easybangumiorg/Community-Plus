@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Delete,
   Get,
@@ -59,13 +60,13 @@ export class CategoryController {
     id = Number(id);
     const count = await this.categoryService.sumPostByCategoryId(1);
     if (count !== 0) {
-      return {
+      throw new BadRequestException({
         code: 400,
         msg: 'Category is not empty',
         data: {
           count,
         },
-      };
+      });
     }
     return {
       code: 200,

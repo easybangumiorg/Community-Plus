@@ -54,7 +54,7 @@ export class AuthService {
     const user = await this.userService.getPasswdUserByID(id, oldPasswd);
     if (!user)
       throw new ForbiddenException({
-        code: 401,
+        code: 403,
         msg: 'Invalid old password',
       });
     return await this.userService.editUserPasswd(id, newPasswd);
