@@ -56,6 +56,7 @@ $ yarn run start:prod
 ## 相关项目
 
 - 纯纯看番 - [EasyBangumi](https://github.com/easybangumiorg/EasyBangumi)
+- 纯纯看番社区+ 后端 - [Community-Plus](https://github.com/easybangumiorg/Community-Plus/)
 - 纯纯看番社区+ 管理前端 - [Community-Plus-FrontEnd](https://github.com/easybangumiorg/Community-Plus-FrontEnd)
 - 纯纯看番社区+ 插件 - [EasyBangumi-Extension-Community-Plus](https://github.com/easybangumiorg/EasyBangumi-Extension-Community-Plus)
 
