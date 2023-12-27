@@ -29,6 +29,10 @@ export const permission = {
   'user.delete': group.admin, // 删除用户
   'user.modify': group.admin, // 修改用户信息
 
+  // 概览相关权限
+  'overview.basic': group.login, // 获取基本概览信息
+  'overview.user': group.login, // 获取当前用户概览信息
+
   // 分类相关权限
   'category.list': group.login, // 获取分类
   'category.get': group.login, // 获取分类信息
