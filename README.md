@@ -2,7 +2,7 @@
   <a href="https://github.com/easybangumiorg/Community-Plus" target="blank"><img src="https://easybangumi.org/icons/FAVICON-RAW.png" width="200" alt="Community Plus LOGO" /></a>
 </p>
 
-<p align="center">一个开源的（现在还没有）、轻量的番剧管理实现，用于纯纯看番社区版插件的后端，专为<a href="https://github.com/easybangumiorg/EasyBangumi" target="blank">纯纯看番</a>插件化而实现。</p>
+<p align="center">一个开源的、轻量的番剧管理实现，用于纯纯看番社区版插件的后端，专为<a href="https://github.com/easybangumiorg/EasyBangumi" target="blank">纯纯看番</a>插件化而实现。</p>
 
 ## 描述
 

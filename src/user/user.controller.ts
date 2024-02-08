@@ -36,6 +36,16 @@ export class UserController {
     };
   }
 
+  @UseGuards(AuthGuard)
+  @Get('refresh')
+  async refresh(@Request() { user }): Promise<ResponseDto<string>> {
+    return {
+      code: 200,
+      msg: 'success',
+      data: await this.auth.refreshToken(user),
+    };
+  }
+
   @NeedPermission('user.profile')
   @UseGuards(AuthGuard)
   @Get('profile')

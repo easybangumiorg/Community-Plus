@@ -59,4 +59,9 @@ export class AuthService {
       });
     return await this.userService.editUserPasswd(id, newPasswd);
   }
+
+  // 刷新Token
+  async refreshToken({ id, acc, rol }: jwtPayload) {
+    return await this.jwt.signAsync({ id, acc, rol });
+  }
 }
