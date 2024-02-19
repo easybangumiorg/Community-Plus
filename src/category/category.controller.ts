@@ -58,7 +58,7 @@ export class CategoryController {
   @Delete(':id')
   async deleteCategory(@Param('id') id: number): Promise<ResponseDto<any>> {
     id = Number(id);
-    const count = await this.categoryService.sumPostByCategoryId(1);
+    const count = await this.categoryService.sumPostByCategoryId(id);
     if (count !== 0) {
       throw new BadRequestException({
         code: 400,
