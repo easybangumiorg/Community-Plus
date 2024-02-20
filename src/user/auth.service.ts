@@ -57,6 +57,11 @@ export class AuthService {
         code: 403,
         msg: 'Invalid old password',
       });
+    if (oldPasswd === newPasswd)
+      throw new ForbiddenException({
+        code: 401,
+        msg: 'Invalid new password',
+      });
     return await this.userService.editUserPasswd(id, newPasswd);
   }
 

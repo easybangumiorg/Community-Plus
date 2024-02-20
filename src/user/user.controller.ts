@@ -108,11 +108,6 @@ export class UserController {
     @Request() { user },
     @Body() { oldPasswd, newPasswd },
   ): Promise<ResponseDto<userProfileDto>> {
-    if (oldPasswd === newPasswd)
-      throw new ForbiddenException({
-        code: 401,
-        msg: 'Invalid new password',
-      });
     return {
       code: 200,
       msg: 'success',
@@ -132,7 +127,6 @@ export class UserController {
       });
     const col = await this.user.sumUserCollections(id);
     const pos = await this.user.sumUserPosts(id);
-    console.log(col, pos);
     if (col + pos > 0)
       throw new ForbiddenException({
         code: 403,
