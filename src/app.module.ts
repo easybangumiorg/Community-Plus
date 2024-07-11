@@ -1,21 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UserController } from './user/user.controller';
-import { UserService } from './user/user.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
+import { ScheduleModule } from '@nestjs/schedule';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { env } from 'process';
-import { AuthService } from './user/auth.service';
-import { UtilsService } from './utils/utils.service';
-import { CategoryService } from './category/category.service';
-import { CategoryController } from './category/category.controller';
-import { PostService } from './post/post.service';
-import { PostController } from './post/post.controller';
-import { CollectionService } from './collection/collection.service';
-import { CollectionController } from './collection/collection.controller';
-import { OverviewService } from './overview/overview.service';
-import { OverviewController } from './overview/overview.controller';
 
 @Module({
   imports: [
@@ -25,24 +16,13 @@ import { OverviewController } from './overview/overview.controller';
       secret: env.JWT_SIGN_KEY,
       signOptions: { expiresIn: '3h' },
     }),
+    ScheduleModule.forRoot(),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      playground: true,
+    }),
   ],
-  controllers: [
-    AppController,
-    UserController,
-    CategoryController,
-    PostController,
-    CollectionController,
-    OverviewController,
-  ],
-  providers: [
-    AppService,
-    UserService,
-    AuthService,
-    UtilsService,
-    CategoryService,
-    PostService,
-    CollectionService,
-    OverviewService,
-  ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

@@ -6,13 +6,9 @@ export class AppService {
   getVersion(): VersionInfoDto {
     return {
       version: '1.2.1',
-      apiVersion: 0,
+      apiVersion: 1,
       apiName: 'easyBangumi-extension-plus',
     };
-  }
-
-  getHello(): string {
-    return '纯纯看番社区API';
   }
 
   getConfig(): AppConfig {

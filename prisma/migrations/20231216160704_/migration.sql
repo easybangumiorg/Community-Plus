@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE `Collection` MODIFY `state` ENUM('DRAFT', 'ON_PRIMARY', 'ON_SECONDARY') NOT NULL DEFAULT 'DRAFT';

@@ -10,7 +10,7 @@ export class AppController {
   getInfo(): ResponseDto<VersionInfoDto> {
     return {
       code: 200,
-      msg: this.appService.getHello(),
+      msg: '纯纯看番社区API',
       data: this.appService.getVersion(),
     };
   }
