@@ -5,10 +5,10 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getLoginUser(email: string, password: string) {
-    return await this.prismaService.user.findUnique({
+    return await this.prisma.user.findUnique({
       where: { email, password },
       select: {
         id: true,
@@ -22,7 +22,7 @@ export class UserService {
   }
 
   async getPasswdUserByID(id: number, password: string) {
-    return await this.prismaService.user.findUnique({
+    return await this.prisma.user.findUnique({
       where: { id, password },
       select: {
         id: true,
@@ -35,8 +35,8 @@ export class UserService {
     });
   }
 
-  async create(data: CreateUserDto) {
-    return await this.prismaService.user.create({
+  async createUser(data: CreateUserDto) {
+    return await this.prisma.user.create({
       data,
       select: {
         id: true,
@@ -49,8 +49,8 @@ export class UserService {
     });
   }
 
-  async getProfile(id: number) {
-    return await this.prismaService.user.findUnique({
+  async getProfileByID(id: number) {
+    return await this.prisma.user.findUnique({
       where: { id },
       select: {
         id: true,
@@ -63,11 +63,11 @@ export class UserService {
     });
   }
 
-  async updateProfile(
+  async updateProfileByID(
     id: number,
     data: Partial<UpdateProfileDto | CreateUserDto>,
   ) {
-    return await this.prismaService.user.update({
+    return await this.prisma.user.update({
       where: { id },
       data,
       select: {
@@ -81,11 +81,11 @@ export class UserService {
     });
   }
 
-  async deleteUser(id: number) {
+  async deleteUserByID(id: number) {
     if (id === 1) {
       throw new MethodNotAllowedException('Can not delete the first user');
     }
-    return await this.prismaService.user.delete({
+    return await this.prisma.user.delete({
       where: { id },
       select: {
         id: true,
@@ -98,9 +98,9 @@ export class UserService {
     });
   }
 
-  async getList(page: number, size: number, select: any = {}) {
+  async getUserList(page: number, size: number, select: any = {}) {
     const [users, totalCount] = await Promise.all([
-      this.prismaService.user.findMany({
+      this.prisma.user.findMany({
         skip: page * size,
         take: size,
         where: select,
@@ -113,7 +113,7 @@ export class UserService {
           role: true,
         },
       }),
-      this.prismaService.user.count(),
+      this.prisma.user.count(),
     ]);
     const total = Math.ceil(totalCount / size);
     const has_next = page * size + users.length < totalCount;

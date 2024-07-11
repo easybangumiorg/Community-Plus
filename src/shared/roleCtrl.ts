@@ -1,5 +1,5 @@
 import { SetMetadata, UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/shared/auth.guard';
+import { AuthGuard } from 'src/shared/guard/auth.guard';
 import { Role } from '@prisma/client';
 // 用户控制，硬编码
 
@@ -12,6 +12,7 @@ export const group = {
 // 用户权限
 export const permission = {
   'resource.public': group.user, // 能够查看公开资源
+  'resource.all': group.editor, // 能够查看所有资源
 
   'user.self': group.user, // 能够设定自己的信息
   'collection.self': group.user, // 能够创建自己的合集并管理它

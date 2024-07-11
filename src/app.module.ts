@@ -8,6 +8,7 @@ import { env } from 'process';
 import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { UserModule } from './user/user.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UserModule } from './user/user.module';
     }),
     ScheduleModule.forRoot(),
     UserModule,
+    CategoryModule,
   ],
   controllers: [AppController, UserController],
   providers: [AppService, UserService],

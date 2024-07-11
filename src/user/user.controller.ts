@@ -15,34 +15,62 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { LoginDto } from './dto/login.dto';
-import { JwtPayload, NeedPermission } from 'src/shared';
+import { JwtPayload, NeedPermission, Role } from 'src/shared';
 import { JwtService } from '@nestjs/jwt';
 
 @Controller('user')
 export class UserController {
   constructor(
-    private readonly userService: UserService,
-    private readonly jwtService: JwtService,
+    private readonly user: UserService,
+    private readonly jwt: JwtService,
   ) {}
 
   @Post('login')
   async login(@Body() { email, password }: LoginDto) {
-    const data = await this.userService.getLoginUser(email, password);
+    const data = await this.user.getLoginUser(email, password);
     if (!data)
       throw new UnauthorizedException({
         statusCode: 401,
-        message: 'Invalid account or password',
+        message: '错误的用户名或密码',
+      });
+    if (data.role === Role.BLOCKED)
+      throw new MethodNotAllowedException({
+        statusCode: 405,
+        message: '用户已被封禁',
       });
     const payload: JwtPayload = {
       id: data.id,
       eml: data.email,
       rol: data.role,
+      rc: 0,
     };
-    const token = await this.jwtService.signAsync(payload);
+    const token = await this.jwt.signAsync(payload);
     return {
       statusCode: 200,
-      message: 'Login success',
+      message: '登录成功',
       data,
+      token,
+    };
+  }
+
+  @NeedPermission('user.self')
+  @Get('referesh-token')
+  async refreshToken(@Request() { user }) {
+    if (user.rc > 5)
+      throw new MethodNotAllowedException({
+        statusCode: 405,
+        message: '令牌刷新次数过多，请重新登录',
+      });
+    const payload: JwtPayload = {
+      id: user.id,
+      eml: user.email,
+      rol: user.role,
+      rc: user.rc + 1,
+    };
+    const token = await this.jwt.signAsync(payload);
+    return {
+      statusCode: 200,
+      message: '令牌刷新成功',
       token,
     };
   }
@@ -50,10 +78,10 @@ export class UserController {
   @NeedPermission('user.self')
   @Get('profile')
   async getProfile(@Request() { user }) {
-    const data = await this.userService.getProfile(user.id);
+    const data = await this.user.getProfileByID(user.id);
     return {
       statusCode: 200,
-      message: 'Profile fetched',
+      message: '获取用户信息成功',
       data,
     };
   }
@@ -61,10 +89,10 @@ export class UserController {
   @NeedPermission('user.self')
   @Post('profile')
   async updateProfile(@Request() { user }, @Body() body: UpdateProfileDto) {
-    const data = await this.userService.updateProfile(user.id, body);
+    const data = await this.user.updateProfileByID(user.id, body);
     return {
       statusCode: 200,
-      message: 'Profile updated',
+      message: '用户信息更新成功',
       data,
     };
   }
@@ -76,28 +104,28 @@ export class UserController {
     @Body('oldPassword') oldPassword: string,
     @Body('newPassword') newPassword: string,
   ) {
-    const selectedUser = await this.userService.getPasswdUserByID(
+    const selectedUser = await this.user.getPasswdUserByID(
       user.id,
       oldPassword,
     );
     if (!selectedUser) {
       throw new NotFoundException({
         statusCode: 404,
-        message: 'User not found',
+        message: '错误的密码',
       });
     }
     if (oldPassword === newPassword) {
       throw new MethodNotAllowedException({
         statusCode: 405,
-        message: 'Old and new password are the same',
+        message: '新旧密码不能相同',
       });
     }
-    const data = await this.userService.updateProfile(user.id, {
+    const data = await this.user.updateProfileByID(user.id, {
       password: newPassword,
     });
     return {
       statusCode: 200,
-      message: 'Password changed',
+      message: '密码修改成功',
       data,
     };
   }
@@ -108,10 +136,10 @@ export class UserController {
     @Query('page', ParseIntPipe) page: number = 0,
     @Query('size', ParseIntPipe) size: number = 20,
   ) {
-    const data = await this.userService.getList(page, size);
+    const data = await this.user.getUserList(page, size);
     return {
       statusCode: 200,
-      message: 'User list fetched',
+      message: '获取用户列表成功',
       data,
     };
   }
@@ -123,10 +151,10 @@ export class UserController {
     @Query('size', ParseIntPipe) size: number = 20,
     @Body() body: any,
   ) {
-    const data = await this.userService.getList(page, size, body);
+    const data = await this.user.getUserList(page, size, body);
     return {
       statusCode: 200,
-      message: 'User list fetched',
+      message: '获取用户列表成功',
       data,
     };
   }
@@ -134,10 +162,10 @@ export class UserController {
   @NeedPermission('user.manage')
   @Post('create')
   async createUser(@Body() body: CreateUserDto) {
-    const data = await this.userService.create(body);
+    const data = await this.user.createUser(body);
     return {
       statusCode: 200,
-      message: 'User created',
+      message: '用户创建成功',
       data,
     };
   }
@@ -145,10 +173,10 @@ export class UserController {
   @NeedPermission('user.manage')
   @Get(':id/info')
   async getUserInfo(@Param('id', ParseIntPipe) id: number) {
-    const data = await this.userService.getProfile(id);
+    const data = await this.user.getProfileByID(id);
     return {
       statusCode: 200,
-      message: 'User info fetched',
+      message: '获取用户信息成功',
       data,
     };
   }
@@ -159,10 +187,10 @@ export class UserController {
     @Param('id', ParseIntPipe) id: number,
     @Body() body: CreateUserDto,
   ) {
-    const data = await this.userService.updateProfile(id, body);
+    const data = await this.user.updateProfileByID(id, body);
     return {
       statusCode: 200,
-      message: 'User info fetched',
+      message: '用户信息更新成功',
       data,
     };
   }
