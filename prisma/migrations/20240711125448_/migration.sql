@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `user` MODIFY `role` ENUM('BLOCKED', 'USER', 'EDITOR', 'ADMIN') NOT NULL DEFAULT 'USER';

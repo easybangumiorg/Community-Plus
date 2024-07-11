@@ -12,6 +12,7 @@ datasource db {
 
 // 用户角色（普通用户、编辑、管理员）
 enum Role {
+  BLOCKED
   USER
   EDITOR
   ADMIN
@@ -30,7 +31,6 @@ enum SiteState {
   DRAFT // 草稿
   READY_PUB // 准备发布
   PUBLISHED // 已发布
-  DELETED // 已删除
 }
 
 // 分类表
@@ -68,18 +68,18 @@ model Choreography {
 
 // 解析过程
 model ParseMethod {
-  id         Int      @id @default(autoincrement())
-  createdAt  DateTime @default(now())
-  lastUpdate DateTime @default(now())
-  author     User     @relation(fields: [authorId], references: [id])
+  id         Int        @id @default(autoincrement())
+  createdAt  DateTime   @default(now())
+  lastUpdate DateTime   @default(now())
+  author     User       @relation(fields: [authorId], references: [id])
   authorId   Int
+  PlayLine   PlayLine[]
 
   name        String
   description String
-  code        String
-  state       SiteState
-  metaData    Json
-  PlayLine    PlayLine[]
+  code        String    @unique // 如straight，这个仅在一阶段硬编码到插件的解析器中使用
+  state       SiteState // 此处发布状态用于之后的流程处理，当标记为公开时所有用户均可使用
+  flow        Json // 解析流程，二阶段存储流程信息
 }
 
 // 用户表
@@ -126,16 +126,16 @@ model Post {
 model PostTag {
   id    Int    @id @default(autoincrement())
   posts Post[]
-  name  String
+  name  String @unique
 }
 
 model PlayLine {
   id            Int            @id @default(autoincrement())
   post          Post           @relation(fields: [postId], references: [id])
-  playLineItem  PlayLineItem[]
+  postId        Int
   parseMethod   ParseMethod    @relation(fields: [parseMethodId], references: [id])
   parseMethodId Int
-  postId        Int
+  playLineItem  PlayLineItem[]
   title         String
 }
 

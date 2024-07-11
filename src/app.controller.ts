@@ -9,8 +9,8 @@ export class AppController {
   @Get()
   getInfo(): ResponseDto<VersionInfoDto> {
     return {
-      code: 200,
-      msg: '纯纯看番社区API',
+      statusCode: 200,
+      message: '纯纯看番社区API',
       data: this.appService.getVersion(),
     };
   }
