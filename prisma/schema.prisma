@@ -47,10 +47,9 @@ model Collection {
   createdAt      DateTime      @default(now())
   lastUpdate     DateTime      @default(now())
   posts          Post[]
-  User           User          @relation(fields: [userId], references: [id])
-  userId         Int
-  choreography   Choreography? @relation(fields: [choreographyId], references: [id])
-  choreographyId Int?
+  author         User          @relation(fields: [authorId], references: [id])
+  authorId       Int
+  choreographyItem   ChoreographyItem[]
 
   title   String
   summary String
@@ -58,12 +57,21 @@ model Collection {
   state   SiteState @default(DRAFT)
 }
 
-//编排表
+//编排与编排项目
 model Choreography {
-  id         Int          @id @default(autoincrement())
-  Collection Collection[]
+  id         Int                @id @default(autoincrement())
+  items      ChoreographyItem[]
   title      String
   weight     Int
+}
+model ChoreographyItem {
+  id             Int          @id @default(autoincrement())
+  choreography   Choreography @relation(fields: [choreographyId], references: [id])
+  choreographyId Int
+  title          String
+  weight         Int
+  collection     Collection?  @relation(fields: [collectionId], references: [id])
+  collectionId   Int?
 }
 
 // 解析过程

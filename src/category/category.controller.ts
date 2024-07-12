@@ -18,7 +18,7 @@ export class CategoryController {
   constructor(private readonly category: CategoryService) {}
 
   @NeedPermission('resource.public')
-  @Get('getAll')
+  @Get('list')
   async getAllCategory() {
     const data = await this.category.getAllCategory();
     return {
@@ -49,7 +49,7 @@ export class CategoryController {
   ) {
     const select: any = {};
     if (!checkPermission(user.role, 'category.manage')) {
-      select.status = SiteState.PUBLISHED;
+      select['status'] = SiteState.PUBLISHED;
     }
     const data = await this.category.getPostByCategoryId(
       id,
@@ -74,7 +74,7 @@ export class CategoryController {
     @Query('size', ParseIntPipe) size: number = 20,
   ) {
     if (!checkPermission(user.role, 'category.manage')) {
-      select.status = SiteState.PUBLISHED;
+      select['status'] = SiteState.PUBLISHED;
     }
     const data = await this.category.getPostByCategoryId(
       id,

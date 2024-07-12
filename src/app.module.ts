@@ -5,10 +5,10 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { env } from 'process';
-import { UserController } from './user/user.controller';
-import { UserService } from './user/user.service';
 import { UserModule } from './user/user.module';
 import { CategoryModule } from './category/category.module';
+import { CollectionModule } from './collection/collection.module';
+import { ChoreographyModule } from './choreography/choreography.module';
 
 @Module({
   imports: [
@@ -21,8 +21,10 @@ import { CategoryModule } from './category/category.module';
     ScheduleModule.forRoot(),
     UserModule,
     CategoryModule,
+    CollectionModule,
+    ChoreographyModule,
   ],
-  controllers: [AppController, UserController],
-  providers: [AppService, UserService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

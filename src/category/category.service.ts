@@ -46,14 +46,14 @@ export class CategoryService {
     id: number,
     page: number = 0,
     size: number = 20,
-    select: any = {},
+    where: any = {},
   ) {
-    const [posts, totalCount] = await Promise.all([
+    const [items, totalCount] = await Promise.all([
       this.prisma.post.findMany({
         skip: page * size,
         take: size,
         where: {
-          ...select,
+          ...where,
           categoryId: id,
         },
         select: {
@@ -76,14 +76,14 @@ export class CategoryService {
         },
       }),
       this.prisma.post.count({
-        where: { ...select, categoryId: id },
+        where: { ...where, categoryId: id },
       }),
     ]);
 
     const total = Math.ceil(totalCount / size);
-    const has_next = page * size + posts.length < totalCount;
+    const has_next = page * size + items.length < totalCount;
     const has_prev = page > 0;
     const next = has_next ? page + 1 : null;
-    return { posts, total, has_next, has_prev, next, totalCount };
+    return { items, total, has_next, has_prev, next, totalCount };
   }
 }

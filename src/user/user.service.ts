@@ -2,6 +2,7 @@ import { Injectable, MethodNotAllowedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -63,10 +64,7 @@ export class UserService {
     });
   }
 
-  async updateProfileByID(
-    id: number,
-    data: Partial<UpdateProfileDto | CreateUserDto>,
-  ) {
+  async updateProfileByID(id: number, data: UpdateUserDto | UpdateProfileDto) {
     return await this.prisma.user.update({
       where: { id },
       data,
@@ -98,12 +96,12 @@ export class UserService {
     });
   }
 
-  async getUserList(page: number, size: number, select: any = {}) {
-    const [users, totalCount] = await Promise.all([
+  async getUserList(page: number, size: number, where: any = {}) {
+    const [items, totalCount] = await Promise.all([
       this.prisma.user.findMany({
         skip: page * size,
         take: size,
-        where: select,
+        where,
         select: {
           id: true,
           email: true,
@@ -115,10 +113,11 @@ export class UserService {
       }),
       this.prisma.user.count(),
     ]);
+
     const total = Math.ceil(totalCount / size);
-    const has_next = page * size + users.length < totalCount;
+    const has_next = page * size + items.length < totalCount;
     const has_prev = page > 0;
     const next = has_next ? page + 1 : null;
-    return { users, total, has_next, has_prev, next, totalCount };
+    return { items, total, has_next, has_prev, next, totalCount };
   }
 }

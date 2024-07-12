@@ -17,6 +17,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload, NeedPermission, Role } from 'src/shared';
 import { JwtService } from '@nestjs/jwt';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -185,7 +186,7 @@ export class UserController {
   @Post(':id/info')
   async updateUserInfo(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: CreateUserDto,
+    @Body() body: UpdateUserDto,
   ) {
     const data = await this.user.updateProfileByID(id, body);
     return {
