@@ -64,14 +64,14 @@ model Choreography {
   title      String
   weight     Int
 }
-model ChoreographyItem {
+model ChoreographyItem { // 该表是Choreography与Collection的具有更多细节的多对多关系表
   id             Int          @id @default(autoincrement())
   choreography   Choreography @relation(fields: [choreographyId], references: [id])
   choreographyId Int
   title          String
   weight         Int
-  collection     Collection?  @relation(fields: [collectionId], references: [id])
-  collectionId   Int?
+  collection     Collection  @relation(fields: [collectionId], references: [id])
+  collectionId   Int
 }
 
 // 解析过程
@@ -87,7 +87,7 @@ model ParseMethod {
   description String
   code        String    @unique // 如straight，这个仅在一阶段硬编码到插件的解析器中使用
   state       SiteState // 此处发布状态用于之后的流程处理，当标记为公开时所有用户均可使用
-  flow        Json // 解析流程，二阶段存储流程信息
+  flow        Json      // 解析流程，二阶段存储流程信息
 }
 
 // 用户表
