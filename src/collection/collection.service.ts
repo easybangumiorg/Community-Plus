@@ -25,6 +25,24 @@ export class CollectionService {
       where: {
         id,
       },
+      select: {
+        id: true,
+        createdAt: true,
+        lastUpdate: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            bio: true,
+          },
+        },
+        authorId: false,
+        title: true,
+        summary: true,
+        cover: true,
+        state: true,
+      },
     });
   }
 

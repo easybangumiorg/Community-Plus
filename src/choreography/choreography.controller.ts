@@ -27,7 +27,7 @@ export class ChoreographyController {
   }
 
   @NeedPermission('resource.public')
-  @Get(':id')
+  @Get(':id/info')
   async getChoreography(@Param('id', ParseIntPipe) id: number) {
     return {
       statusCode: 200,

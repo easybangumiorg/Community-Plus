@@ -1,5 +1,5 @@
+import { $Enums } from '@prisma/client';
 import { IsEnum, IsString, IsUrl } from 'class-validator';
-import { Role } from 'src/shared';
 
 export class UpdateCollectionDto {
   @IsString()
@@ -11,6 +11,6 @@ export class UpdateCollectionDto {
   @IsUrl()
   cover?: string;
 
-  @IsEnum(Role)
-  status?: Role;
+  @IsEnum($Enums.SiteState)
+  status?: $Enums.SiteState;
 }

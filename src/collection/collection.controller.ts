@@ -108,6 +108,7 @@ export class CollectionController {
       };
     } else {
       const post_infos = await this.collection.getPostInfosByIDs(posts);
+      // 不具备管理合集权限的用户，只能将公开或是自己的内容添加到合集
       const valid_posts = post_infos.filter(post => {
         if (user_can_manage_collection) return true;
         return post.authorId === user.id || post.state === SiteState.PUBLISHED;
@@ -163,14 +164,13 @@ export class CollectionController {
     @Request() { user },
   ) {
     const collection = await this.collection.getCollectionInfo(id);
-    if (!collection)
-      throw new NotFoundException({
-        statusCode: 404,
-        message: '无法找到该合集',
-      });
     if (
-      collection.state !== SiteState.PUBLISHED &&
-      !checkPermission(user.role, 'resource.all')
+      !collection ||
+      (!(
+        collection.author.id === user.id ||
+        collection.state === SiteState.PUBLISHED
+      ) &&
+        !checkPermission(user.role, 'resource.all'))
     )
       throw new NotFoundException({
         statusCode: 404,
@@ -192,7 +192,7 @@ export class CollectionController {
   ) {
     const where = {};
     if (!checkPermission(user.role, 'resource.all'))
-      where['state'] = SiteState.PUBLISHED;
+      where['OR'] = [{ authorId: user.id }, { state: SiteState.PUBLISHED }];
     const data = await this.collection.getCollectionList(page, size, where);
     return {
       statusCode: 200,
@@ -209,8 +209,21 @@ export class CollectionController {
     @Param('size', ParseIntPipe) size: number,
     @Body() select: any,
   ) {
-    if (!checkPermission(user.role, 'resource.all'))
-      select['state'] = SiteState.PUBLISHED;
+    if (!checkPermission(user.role, 'resource.all')) {
+      // 这种限制并不是最佳实践，以后考虑优化
+      if (select.authorId && select.authorId !== user.id)
+        throw new NotFoundException({
+          statusCode: 404,
+          message: '只能查看自己的合集',
+        });
+      if (select.state && select.state !== SiteState.PUBLISHED)
+        throw new NotFoundException({
+          statusCode: 404,
+          message: '只能查看已发布的合集',
+        });
+      if (select.OR)
+        select.OR = [{ authorId: user.id }, { state: SiteState.PUBLISHED }];
+    }
     const data = await this.collection.getCollectionList(page, size, select);
     return {
       statusCode: 200,
@@ -228,18 +241,14 @@ export class CollectionController {
     @Param('size', ParseIntPipe) size: number,
   ) {
     const collection = await this.collection.getCollectionInfo(id);
-    if (!collection)
-      throw new NotFoundException({
-        statusCode: 404,
-        message: '无法找到该合集',
-      });
     // 如果没有合集管理权限，用户只能查看自己和公开的合集中的内容
     if (
-      !(
-        collection.authorId === user.id ||
+      !collection ||
+      (!(
+        collection.author.id === user.id ||
         collection.state === SiteState.PUBLISHED
       ) &&
-      !checkPermission(user.role, 'resource.all')
+        !checkPermission(user.role, 'resource.all'))
     )
       throw new NotFoundException({
         statusCode: 404,
@@ -264,18 +273,14 @@ export class CollectionController {
     @Body() select: any,
   ) {
     const collection = await this.collection.getCollectionInfo(id);
-    if (!collection)
-      throw new NotFoundException({
-        statusCode: 404,
-        message: '无法找到该合集',
-      });
     // 如果没有合集管理权限，用户只能查看自己和公开的合集中的内容
     if (
-      !(
-        collection.authorId === user.id ||
+      !collection ||
+      (!(
+        collection.author.id === user.id ||
         collection.state === SiteState.PUBLISHED
       ) &&
-      !checkPermission(user.role, 'resource.all')
+        !checkPermission(user.role, 'resource.all'))
     )
       throw new NotFoundException({
         statusCode: 404,

@@ -9,6 +9,7 @@ import { UserModule } from './user/user.module';
 import { CategoryModule } from './category/category.module';
 import { CollectionModule } from './collection/collection.module';
 import { ChoreographyModule } from './choreography/choreography.module';
+import { ParsemethodModule } from './parsemethod/parsemethod.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ChoreographyModule } from './choreography/choreography.module';
     CategoryModule,
     CollectionModule,
     ChoreographyModule,
+    ParsemethodModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -4,6 +4,6 @@ import { ChoreographyController } from './choreography.controller';
 
 @Module({
   providers: [ChoreographyService],
-  controllers: [ChoreographyController]
+  controllers: [ChoreographyController],
 })
 export class ChoreographyModule {}

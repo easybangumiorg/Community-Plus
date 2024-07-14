@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateCategoryDto {
+export class CreatePraseMethodDto {
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -8,4 +8,8 @@ export class CreateCategoryDto {
   @IsString()
   @IsNotEmpty()
   description: string;
+
+  @IsString()
+  @IsNotEmpty()
+  code: string;
 }
