@@ -10,6 +10,8 @@ import { CategoryModule } from './category/category.module';
 import { CollectionModule } from './collection/collection.module';
 import { ChoreographyModule } from './choreography/choreography.module';
 import { ParsemethodModule } from './parsemethod/parsemethod.module';
+import { PostModule } from './post/post.module';
+import { TagModule } from './tag/tag.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { ParsemethodModule } from './parsemethod/parsemethod.module';
     CollectionModule,
     ChoreographyModule,
     ParsemethodModule,
+    PostModule,
+    TagModule,
   ],
   controllers: [AppController],
   providers: [AppService],

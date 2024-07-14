@@ -67,7 +67,7 @@ export class CategoryService {
           updateState: true,
           nsfw: true,
           title: true,
-          publishDate: true,
+          publishedDate: true,
           summary: true,
           cover: true,
           tags: {

@@ -210,7 +210,7 @@ export class CollectionController {
     @Body() select: any,
   ) {
     if (!checkPermission(user.role, 'resource.all')) {
-      // 这种限制并不是最佳实践，以后考虑优化
+      //! 这种限制并不是最佳实践，以后考虑优化
       if (select.authorId && select.authorId !== user.id)
         throw new NotFoundException({
           statusCode: 404,

@@ -48,9 +48,8 @@ export class CategoryController {
     @Query('size', ParseIntPipe) size: number = 20,
   ) {
     const select: any = {};
-    if (!checkPermission(user.role, 'category.manage')) {
-      select['status'] = SiteState.PUBLISHED;
-    }
+    if (!checkPermission(user.role, 'category.manage'))
+      select['OR'] = [{ authorId: user.id }, { state: SiteState.PUBLISHED }];
     const data = await this.category.getPostByCategoryId(
       id,
       page,
@@ -73,9 +72,8 @@ export class CategoryController {
     @Query('page', ParseIntPipe) page: number = 0,
     @Query('size', ParseIntPipe) size: number = 20,
   ) {
-    if (!checkPermission(user.role, 'category.manage')) {
-      select['status'] = SiteState.PUBLISHED;
-    }
+    if (!checkPermission(user.role, 'category.manage'))
+      select['OR'] = [{ authorId: user.id }, { state: SiteState.PUBLISHED }];
     const data = await this.category.getPostByCategoryId(
       id,
       page,

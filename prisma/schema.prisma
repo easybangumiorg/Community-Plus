@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
@@ -31,6 +32,17 @@ enum SiteState {
   DRAFT // 草稿
   READY_PUB // 准备发布
   PUBLISHED // 已发布
+}
+
+// 何时更新
+enum UpdateAt {
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
 }
 
 // 分类表
@@ -87,7 +99,7 @@ model ParseMethod {
   name        String
   description String
   code        String    @unique // 如straight，这个仅在一阶段硬编码到插件的解析器中使用
-  state       SiteState // 此处发布状态用于之后的流程处理，当标记为公开时所有用户均可使用
+  state       SiteState @default(DRAFT) // 此处发布状态用于之后的流程处理，当标记为公开时所有用户均可使用
   flow        Json // 解析流程，二阶段存储流程信息
 }
 
@@ -118,24 +130,27 @@ model Post {
   categoryId Int
   collection Collection[]
   playLines  PlayLine[]
+  tags       PostTag[]
 
-  state       SiteState
-  updateState UpdateState
-  nsfw        Boolean
+  state       SiteState    @default(DRAFT)
+  updateState UpdateState?
+  updateAt    UpdateAt?
+  nsfw        Boolean      @default(false)
 
   title          String
-  publishDate    DateTime
-  summary        String
-  cover          String
-  tags           PostTag[]
-  extendmetaData Json
+  publishedDate  DateTime?
+  summary        String?
+  cover          String    @default("https://easybangumi.org/icons/FAVICON-RAW.png")
+  extendmetaData Json?
+
+  @@fulltext([title, summary])
 }
 
 // 番剧标签
 model PostTag {
-  id    Int    @id @default(autoincrement())
-  posts Post[]
-  name  String @unique
+  id      Int     @id @default(autoincrement())
+  posts   Post[]
+  name    String  @unique
 }
 
 model PlayLine {
@@ -153,5 +168,5 @@ model PlayLineItem {
   playLine   PlayLine @relation(fields: [playLineId], references: [id])
   playLineId Int
   title      String
-  item       String
+  item       String?
 }

@@ -86,9 +86,7 @@ export class CollectionService {
         take: size,
         where,
       }),
-      this.prisma.collection.count({
-        where,
-      }),
+      this.prisma.collection.count({ where }),
     ]);
 
     const total = Math.ceil(totalCount / size);
@@ -123,7 +121,7 @@ export class CollectionService {
           updateState: true,
           nsfw: true,
           title: true,
-          publishDate: true,
+          publishedDate: true,
           summary: true,
           cover: true,
           tags: {
@@ -149,6 +147,7 @@ export class CollectionService {
         id: collectionId,
       },
       data: {
+        lastUpdate: new Date(),
         posts: {
           disconnect: postIds.map(id => ({ id })),
         },
@@ -162,6 +161,7 @@ export class CollectionService {
         id: collectionId,
       },
       data: {
+        lastUpdate: new Date(),
         posts: {
           connect: postIds.map(id => ({ id })),
         },
