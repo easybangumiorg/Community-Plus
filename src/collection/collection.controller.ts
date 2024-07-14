@@ -8,11 +8,13 @@ import {
   Get,
   Request,
   ParseArrayPipe,
+  MethodNotAllowedException,
 } from '@nestjs/common';
 import { CollectionService } from './collection.service';
 import { checkPermission, NeedPermission } from 'src/shared';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { SiteState } from '@prisma/client';
+import { UpdateCollectionDto } from './dto/update-collection.dto';
 
 @Controller('collection')
 export class CollectionController {
@@ -22,13 +24,13 @@ export class CollectionController {
   @Post('create')
   async createCollection(
     @Request() { user },
-    @Body() data: CreateCollectionDto,
+    @Body() body: CreateCollectionDto,
   ) {
-    const collection = await this.collection.createCollection(user.id, data);
+    const data = await this.collection.createCollection(user.id, body);
     return {
       statusCode: 200,
       message: '创建成功',
-      data: collection,
+      data,
     };
   }
 
@@ -38,14 +40,19 @@ export class CollectionController {
     @Request() { user },
     @Param('id', ParseIntPipe) id: number,
   ) {
-    const user_collection = await this.collection.findUserCollection(
-      user.id,
-      id,
-    );
-    if (!user_collection && !checkPermission(user.role, 'collection.manage'))
+    const collection = await this.collection.getCollectionInfo(id);
+    if (!collection)
       throw new NotFoundException({
         statusCode: 404,
         message: '无法找到该合集',
+      });
+    if (
+      collection.author.id !== user.id &&
+      !checkPermission(user.role, 'collection.manage')
+    )
+      throw new MethodNotAllowedException({
+        statusCode: 405,
+        message: '无法删除其他用户创建的合集',
       });
     const data = await this.collection.deleteCollection(id);
     return {
@@ -59,23 +66,63 @@ export class CollectionController {
   @Post(':id/update')
   async updateCollection(
     @Request() { user },
-    @Body() data: CreateCollectionDto,
+    @Body() body: UpdateCollectionDto,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    const user_collection = await this.collection.findUserCollection(
-      user.id,
-      id,
-    );
-    if (!user_collection && !checkPermission(user.role, 'collection.manage'))
+    const collection = await this.collection.getCollectionInfo(id);
+    if (!collection)
       throw new NotFoundException({
         statusCode: 404,
         message: '无法找到该合集',
       });
-    const collection = await this.collection.updateCollection(user.id, data);
+    if (
+      collection.author.id !== user.id &&
+      !checkPermission(user.role, 'collection.manage')
+    )
+      throw new MethodNotAllowedException({
+        statusCode: 405,
+        message: '无法修改其他用户创建的合集',
+      });
+    if (body.status && !checkPermission(user.role, 'collection.manage'))
+      throw new MethodNotAllowedException({
+        statusCode: 405,
+        message: '无法修改合集状态',
+      });
+    const data = await this.collection.updateCollection(user.id, body);
     return {
       statusCode: 200,
       message: '更新成功',
-      data: collection,
+      data,
+    };
+  }
+
+  @NeedPermission('collection.self')
+  @Get(':id/ready_pub')
+  async readyPublishCollection(
+    @Request() { user },
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    const collection = await this.collection.getCollectionInfo(id);
+    if (!collection)
+      throw new NotFoundException({
+        statusCode: 404,
+        message: '无法找到该合集',
+      });
+    if (
+      collection.author.id !== user.id &&
+      !checkPermission(user.role, 'collection.manage')
+    )
+      throw new MethodNotAllowedException({
+        statusCode: 405,
+        message: '无法操作其他用户创建的合集',
+      });
+    const data = await this.collection.updateCollection(id, {
+      status: SiteState.READY_PUB,
+    });
+    return {
+      statusCode: 200,
+      message: '操作成功',
+      data,
     };
   }
 
@@ -86,18 +133,20 @@ export class CollectionController {
     @Param('id', ParseIntPipe) id: number,
     @Body('posts', ParseArrayPipe) posts: number[],
   ) {
-    const user_collection = await this.collection.findUserCollection(
-      user.id,
-      id,
-    );
+    const collection = await this.collection.getCollectionInfo(id);
+    if (!collection)
+      throw new NotFoundException({
+        statusCode: 404,
+        message: '无法找到该合集',
+      });
     const user_can_manage_collection = checkPermission(
       user.role,
       'collection.manage',
     );
-    if (!user_collection && !user_can_manage_collection)
-      throw new NotFoundException({
-        statusCode: 404,
-        message: '无法找到该合集',
+    if (collection.author.id !== user.id && !user_can_manage_collection)
+      throw new MethodNotAllowedException({
+        statusCode: 405,
+        message: '不能向其他用户创建的合集添加内容',
       });
     if (user_can_manage_collection) {
       const collection = await this.collection.addItemsToCollection(id, posts);
@@ -109,13 +158,12 @@ export class CollectionController {
     } else {
       const post_infos = await this.collection.getPostInfosByIDs(posts);
       // 不具备管理合集权限的用户，只能将公开或是自己的内容添加到合集
-      const valid_posts = post_infos.filter(post => {
-        if (user_can_manage_collection) return true;
-        return post.authorId === user.id || post.state === SiteState.PUBLISHED;
-      });
+      const valid_posts = post_infos.filter(
+        post => post.authorId === user.id || post.state === SiteState.PUBLISHED,
+      );
       if (valid_posts.length === 0)
-        throw new NotFoundException({
-          statusCode: 404,
+        throw new MethodNotAllowedException({
+          statusCode: 405,
           message: '没有有效的内容可以添加到合集',
         });
       const collection = await this.collection.addItemsToCollection(
@@ -137,23 +185,25 @@ export class CollectionController {
     @Param('id', ParseIntPipe) id: number,
     @Body('posts', ParseArrayPipe) posts: number[],
   ) {
-    const user_collection = await this.collection.findUserCollection(
-      user.id,
-      id,
-    );
-    if (!user_collection && !checkPermission(user.role, 'collection.manage'))
+    const collection = await this.collection.getCollectionInfo(id);
+    if (!collection)
       throw new NotFoundException({
         statusCode: 404,
         message: '无法找到该合集',
       });
-    const collection = await this.collection.removeItemsFromCollection(
-      id,
-      posts,
-    );
+    if (
+      collection.author.id !== user.id &&
+      !checkPermission(user.role, 'collection.manage')
+    )
+      throw new MethodNotAllowedException({
+        statusCode: 405,
+        message: '不能删除其他用户创建的合集',
+      });
+    const data = await this.collection.removeItemsFromCollection(id, posts);
     return {
       statusCode: 200,
       message: '移除成功',
-      data: collection,
+      data,
     };
   }
 
@@ -164,17 +214,21 @@ export class CollectionController {
     @Request() { user },
   ) {
     const collection = await this.collection.getCollectionInfo(id);
-    if (
-      !collection ||
-      (!(
-        collection.author.id === user.id ||
-        collection.state === SiteState.PUBLISHED
-      ) &&
-        !checkPermission(user.role, 'resource.all'))
-    )
+    if (!collection)
       throw new NotFoundException({
         statusCode: 404,
         message: '无法找到该合集',
+      });
+    if (
+      !(
+        collection.author.id === user.id ||
+        collection.state === SiteState.PUBLISHED
+      ) &&
+      !checkPermission(user.role, 'resource.all')
+    )
+      throw new MethodNotAllowedException({
+        statusCode: 405,
+        message: '无法获取非自己创建且非公开合集的信息',
       });
     return {
       statusCode: 200,
@@ -209,21 +263,9 @@ export class CollectionController {
     @Param('size', ParseIntPipe) size: number,
     @Body() select: any,
   ) {
-    if (!checkPermission(user.role, 'resource.all')) {
-      //! 这种限制并不是最佳实践，以后考虑优化
-      if (select.authorId && select.authorId !== user.id)
-        throw new NotFoundException({
-          statusCode: 404,
-          message: '只能查看自己的合集',
-        });
-      if (select.state && select.state !== SiteState.PUBLISHED)
-        throw new NotFoundException({
-          statusCode: 404,
-          message: '只能查看已发布的合集',
-        });
-      if (select.OR)
-        select.OR = [{ authorId: user.id }, { state: SiteState.PUBLISHED }];
-    }
+    //! 这种限制并不是最佳实践，以后考虑优化
+    if (!checkPermission(user.role, 'resource.all'))
+      select['OR'] = [{ authorId: user.id }, { state: SiteState.PUBLISHED }];
     const data = await this.collection.getCollectionList(page, size, select);
     return {
       statusCode: 200,
@@ -241,18 +283,22 @@ export class CollectionController {
     @Param('size', ParseIntPipe) size: number,
   ) {
     const collection = await this.collection.getCollectionInfo(id);
-    // 如果没有合集管理权限，用户只能查看自己和公开的合集中的内容
-    if (
-      !collection ||
-      (!(
-        collection.author.id === user.id ||
-        collection.state === SiteState.PUBLISHED
-      ) &&
-        !checkPermission(user.role, 'resource.all'))
-    )
+    if (!collection)
       throw new NotFoundException({
         statusCode: 404,
         message: '无法找到该合集',
+      });
+    // 如果没有合集管理权限，用户只能查看自己和公开的合集中的内容
+    if (
+      !(
+        collection.author.id === user.id ||
+        collection.state === SiteState.PUBLISHED
+      ) &&
+      !checkPermission(user.role, 'resource.all')
+    )
+      throw new MethodNotAllowedException({
+        statusCode: 405,
+        message: '无法查看非自己创建且非公开的合集内容',
       });
     // 公开合集中存在未发布的内容，用户也可以查看
     const data = await this.collection.listCollectionItemsByID(id, page, size);
@@ -273,18 +319,22 @@ export class CollectionController {
     @Body() select: any,
   ) {
     const collection = await this.collection.getCollectionInfo(id);
-    // 如果没有合集管理权限，用户只能查看自己和公开的合集中的内容
-    if (
-      !collection ||
-      (!(
-        collection.author.id === user.id ||
-        collection.state === SiteState.PUBLISHED
-      ) &&
-        !checkPermission(user.role, 'resource.all'))
-    )
+    if (!collection)
       throw new NotFoundException({
         statusCode: 404,
         message: '无法找到该合集',
+      });
+    // 如果没有合集管理权限，用户只能查看自己和公开的合集中的内容
+    if (
+      !(
+        collection.author.id === user.id ||
+        collection.state === SiteState.PUBLISHED
+      ) &&
+      !checkPermission(user.role, 'resource.all')
+    )
+      throw new MethodNotAllowedException({
+        statusCode: 405,
+        message: '无法查看非自己创建且非公开的合集内容',
       });
     // 公开合集中存在未发布的内容，用户也可以查看
     const data = await this.collection.listCollectionItemsByID(

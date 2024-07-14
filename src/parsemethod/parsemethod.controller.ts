@@ -27,7 +27,7 @@ export class ParsemethodController {
     @Body() body: CreatePraseMethodDto,
   ) {
     return {
-      statusCode: 201,
+      statusCode: 200,
       message: '创建解析方法成功',
       data: await this.parsemethod.createParseMethod(user.id, body),
     };
@@ -40,14 +40,19 @@ export class ParsemethodController {
     @Request() { user },
     @Body() body: UpdatePraseMethodDto,
   ) {
-    const user_parsemethod = await this.parsemethod.findUserParseMethods(
-      user.id,
-      id,
-    );
-    if (!user_parsemethod && !checkPermission(user.role, 'parse_method.manage'))
+    const parsemethod = await this.parsemethod.getParseMethod(id);
+    if (!parsemethod)
       throw new NotFoundException({
         statusCode: 404,
-        message: '找不到这个解析方法',
+        message: '找不到该解析方法',
+      });
+    if (
+      parsemethod.author.id !== user.id &&
+      !checkPermission(user.role, 'parse_method.manage')
+    )
+      throw new MethodNotAllowedException({
+        statusCode: 405,
+        message: '不能修改其他用户创建的解析方法',
       });
     if (body.state && !checkPermission(user.role, 'parse_method.manage'))
       throw new MethodNotAllowedException({
@@ -67,14 +72,19 @@ export class ParsemethodController {
     @Param('id', ParseIntPipe) id: number,
     @Request() { user },
   ) {
-    const user_parsemethod = await this.parsemethod.findUserParseMethods(
-      user.id,
-      id,
-    );
-    if (!user_parsemethod && !checkPermission(user.role, 'parse_method.manage'))
+    const parsemethod = await this.parsemethod.getParseMethod(id);
+    if (!parsemethod)
       throw new NotFoundException({
         statusCode: 404,
-        message: '找不到这个解析方法',
+        message: '找不到该解析方法',
+      });
+    if (
+      parsemethod.author.id !== user.id &&
+      !checkPermission(user.role, 'parse_method.manage')
+    )
+      throw new MethodNotAllowedException({
+        statusCode: 405,
+        message: '不能删除其他用户创建的解析方法',
       });
     return {
       statusCode: 200,
@@ -90,14 +100,18 @@ export class ParsemethodController {
     @Request() { user },
   ) {
     const data = await this.parsemethod.getParseMethod(id);
+    if (!data)
+      throw new NotFoundException({
+        statusCode: 404,
+        message: '找不到该解析方法',
+      });
     if (
-      !data ||
-      (!(data.author.id === user.id || data.state === SiteState.PUBLISHED) &&
-        !checkPermission(user.role, 'resource.all'))
+      !(data.author.id === user.id || data.state === SiteState.PUBLISHED) &&
+      !checkPermission(user.role, 'resource.all')
     )
       throw new NotFoundException({
         statusCode: 404,
-        message: '找不到这个解析方法',
+        message: '找不到或是无法访问这个解析方法',
       });
     return {
       statusCode: 200,
@@ -106,12 +120,38 @@ export class ParsemethodController {
     };
   }
 
+  @NeedPermission('paese_method.self')
+  @Get(':id/ready_pub')
+  async readyPublishParseMethod(
+    @Param('id', ParseIntPipe) id: number,
+    @Request() { user },
+  ) {
+    const parsemethod = await this.parsemethod.getParseMethod(id);
+    if (!parsemethod)
+      throw new NotFoundException({
+        statusCode: 404,
+        message: '找不到该解析方法',
+      });
+    if (parsemethod.author.id !== user.id)
+      throw new MethodNotAllowedException({
+        statusCode: 405,
+        message: '不能预发布其他用户创建的解析方法',
+      });
+    return {
+      statusCode: 200,
+      message: '准备发布解析方法成功',
+      data: await this.parsemethod.updateParseMethod(id, {
+        state: SiteState.READY_PUB,
+      }),
+    };
+  }
+
   @NeedPermission('resource.public')
   @Get('list')
   async listParseMethods(
     @Request() { user },
-    @Query('page', ParseIntPipe) page,
-    @Query('size', ParseIntPipe) size,
+    @Query('page', ParseIntPipe) page: number,
+    @Query('size', ParseIntPipe) size: number,
   ) {
     const where = {};
     if (!checkPermission(user.role, 'resource.all'))
@@ -132,21 +172,9 @@ export class ParsemethodController {
     @Query('size', ParseIntPipe) size,
     @Body() select: any,
   ) {
-    if (!checkPermission(user.role, 'resource.all')) {
-      // 这种限制并不是最佳实践，以后考虑优化
-      if (select.authorId && select.authorId !== user.id)
-        throw new NotFoundException({
-          statusCode: 404,
-          message: '只能查看自己的合集',
-        });
-      if (select.state && select.state !== SiteState.PUBLISHED)
-        throw new NotFoundException({
-          statusCode: 404,
-          message: '只能查看已发布的合集',
-        });
-      if (select.OR)
-        select.OR = [{ authorId: user.id }, { state: SiteState.PUBLISHED }];
-    }
+    // 这种限制并不是最佳实践，以后考虑优化
+    if (!checkPermission(user.role, 'resource.all'))
+      select['OR'] = [{ authorId: user.id }, { state: SiteState.PUBLISHED }];
     const data = await this.parsemethod.listParseMethods(page, size, select);
     return {
       statusCode: 200,

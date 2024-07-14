@@ -37,7 +37,6 @@ export class CollectionService {
             bio: true,
           },
         },
-        authorId: false,
         title: true,
         summary: true,
         cover: true,
@@ -62,15 +61,6 @@ export class CollectionService {
     return await this.prisma.collection.delete({
       where: {
         id,
-      },
-    });
-  }
-
-  async findUserCollection(authorId: number, id: number) {
-    return await this.prisma.collection.findUnique({
-      where: {
-        id,
-        authorId,
       },
     });
   }

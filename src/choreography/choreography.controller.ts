@@ -1,4 +1,11 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Query,
+} from '@nestjs/common';
 import { ChoreographyService } from './choreography.service';
 import { NeedPermission } from 'src/shared';
 
@@ -9,30 +16,38 @@ export class ChoreographyController {
   @NeedPermission('resource.public')
   @Get('list')
   async listChoreographies() {
+    const data = await this.choreography.listChoreographies();
     return {
       statusCode: 200,
       message: 'Success',
-      data: await this.choreography.listChoreographies(),
+      data,
     };
   }
 
   @NeedPermission('choreography.manage')
   @Get('create')
   async createChoreography(@Query('title') title: string) {
+    const data = await this.choreography.createChoreography(title);
     return {
       statusCode: 200,
       message: 'Success',
-      data: await this.choreography.createChoreography(title),
+      data,
     };
   }
 
   @NeedPermission('resource.public')
   @Get(':id/info')
   async getChoreography(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.choreography.getChoreography(id);
+    if (!data)
+      throw new NotFoundException({
+        statusCode: 404,
+        message: '未找到这个编排',
+      });
     return {
       statusCode: 200,
       message: 'Success',
-      data: await this.choreography.getChoreography(id),
+      data,
     };
   }
 
@@ -42,20 +57,22 @@ export class ChoreographyController {
     @Param('id', ParseIntPipe) id: number,
     @Query('weight', ParseIntPipe) weight: number,
   ) {
+    const data = await this.choreography.setChoreographyWeight(id, weight);
     return {
       statusCode: 200,
       message: 'Success',
-      data: await this.choreography.setChoreographyWeight(id, weight),
+      data,
     };
   }
 
   @NeedPermission('choreography.manage')
   @Get(':id/delete')
   async deleteChoreography(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.choreography.deleteChoreography(id);
     return {
       statusCode: 200,
       message: 'Success',
-      data: await this.choreography.deleteChoreography(id),
+      data,
     };
   }
 
@@ -66,10 +83,15 @@ export class ChoreographyController {
     @Query('collectionId') collection: number,
     @Query('title', ParseIntPipe) title: string,
   ) {
+    const data = await this.choreography.addChoreographyItem(
+      id,
+      collection,
+      title,
+    );
     return {
       statusCode: 200,
       message: 'Success',
-      data: await this.choreography.addChoreographyItem(id, collection, title),
+      data,
     };
   }
 
@@ -79,10 +101,11 @@ export class ChoreographyController {
     @Param('id', ParseIntPipe) id: number,
     @Query('itemId', ParseIntPipe) itemId: number,
   ) {
+    const data = await this.choreography.removeChoreographyItem(itemId);
     return {
       statusCode: 200,
       message: 'Success',
-      data: await this.choreography.removeChoreographyItem(itemId),
+      data,
     };
   }
 
@@ -92,10 +115,14 @@ export class ChoreographyController {
     @Query('itemId', ParseIntPipe) itemId: number,
     @Query('weight', ParseIntPipe) weight: number,
   ) {
+    const data = await this.choreography.setChoreographyItemWeight(
+      itemId,
+      weight,
+    );
     return {
       statusCode: 200,
       message: 'Success',
-      data: await this.choreography.setChoreographyItemWeight(itemId, weight),
+      data,
     };
   }
 }

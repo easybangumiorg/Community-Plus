@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
@@ -78,21 +77,9 @@ export class TagController {
     @Query('size', ParseIntPipe) size: number,
     @Body() select: any,
   ) {
-    if (!checkPermission(user.role, 'resource.all')) {
-      //! 这种限制并不是最佳实践，以后考虑优化
-      if (select.authorId && select.authorId !== user.id)
-        throw new NotFoundException({
-          statusCode: 404,
-          message: '只能查看自己的文章',
-        });
-      if (select.state && select.state !== SiteState.PUBLISHED)
-        throw new NotFoundException({
-          statusCode: 404,
-          message: '只能查看已发布的文章',
-        });
-      if (select.OR)
-        select.OR = [{ authorId: user.id }, { state: SiteState.PUBLISHED }];
-    }
+    //! 这种限制并不是最佳实践，以后考虑优化
+    if (!checkPermission(user.role, 'resource.all'))
+      select.OR = [{ authorId: user.id }, { state: SiteState.PUBLISHED }];
     const data = await this.tag.listTagItems(tagId, page, size, select);
     return {
       statusCode: 200,

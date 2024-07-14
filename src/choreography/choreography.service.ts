@@ -29,6 +29,8 @@ export class ChoreographyService {
     return await this.prisma.choreography.findUnique({
       where: { id },
       select: {
+        title: true,
+        weight: true,
         items: {
           select: {
             id: true,
@@ -58,6 +60,9 @@ export class ChoreographyService {
   }
 
   async deleteChoreography(id: number) {
+    await this.prisma.choreographyItem.deleteMany({
+      where: { choreographyId: id },
+    });
     return await this.prisma.choreography.delete({
       where: { id },
     });

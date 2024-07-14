@@ -12,5 +12,5 @@ export class UpdatePraseMethodDto {
   state?: $Enums.SiteState;
 
   @IsObject()
-  flow: string;
+  flow?: any;
 }

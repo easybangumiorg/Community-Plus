@@ -8,17 +8,6 @@ import { UpdatePraseMethodDto } from './dto/update-prase.dto';
 export class ParsemethodService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findUserParseMethods(userId: number, id: number) {
-    return await this.prisma.parseMethod.findMany({
-      where: { authorId: userId, id },
-      select: {
-        id: true,
-        authorId: false,
-        state: true,
-      },
-    });
-  }
-
   async listParseMethods(page: number, size: number, where: any = {}) {
     const [items, totalCount] = await Promise.all([
       this.prisma.parseMethod.findMany({

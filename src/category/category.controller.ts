@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
@@ -32,6 +33,11 @@ export class CategoryController {
   @Get(':id/info')
   async getCategoryById(@Param(ParseIntPipe) { id }) {
     const data = await this.category.getCategoryById(id);
+    if (!data)
+      throw new NotFoundException({
+        statusCode: 404,
+        message: '找不到该分类',
+      });
     return {
       statusCode: 200,
       message: '获取分类信息成功',
@@ -64,7 +70,7 @@ export class CategoryController {
   }
 
   @NeedPermission('resource.public')
-  @Get(':id/posts')
+  @Post(':id/posts')
   async getPostWithSelectByCategoryId(
     @Request() { user },
     @Body() select: any,
@@ -90,11 +96,11 @@ export class CategoryController {
   @NeedPermission('category.manage')
   @Post(':id/delete')
   async deleteCategory(@Param(ParseIntPipe) { id }) {
-    const res = await this.category.deleteCategory(id);
+    const data = await this.category.deleteCategory(id);
     return {
       statusCode: 200,
       message: '删除分类成功',
-      data: res,
+      data,
     };
   }
 
@@ -114,12 +120,12 @@ export class CategoryController {
 
   @NeedPermission('category.manage')
   @Post('create')
-  async createCategory(@Body() data: CreateCategoryDto) {
-    const res = await this.category.createCategory(data);
+  async createCategory(@Body() body: CreateCategoryDto) {
+    const data = await this.category.createCategory(body);
     return {
       statusCode: 201,
       message: '创建分类成功',
-      data: res,
+      data,
     };
   }
 }
